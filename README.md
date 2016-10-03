@@ -6,5 +6,5 @@
 ```
 $ yum install -y livecd-tools
 $ curl -O <cfg or ks file>
-$ livecd-creator --config /root/centos-7-livedocker.cfg  --fslabel=Image-Label
+$ livecd-creator --config /<path>/centos-7-livedocker.cfg
 ```
