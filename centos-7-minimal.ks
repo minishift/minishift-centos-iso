@@ -65,8 +65,6 @@ shim
 LANG="en_US"
 echo "%_install_lang $LANG" > /etc/rpm/macros.image-language-conf
 
-systemctl enable docker
-
 # Remove redhat-logo and firmware package to help with reduce box size
 yum remove -y redhat-logos linux-firmware
 # Remove doc except copyright
