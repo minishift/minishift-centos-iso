@@ -33,7 +33,7 @@
 ```
 $ git clone https://github.com/LalatenduMohanty/centos-live-iso.git
 $ cd centos-live-iso
-$ livecd-creator --config ./centos-7-livedocker.cfg
+$ livecd-creator --config ./centos-7-minimal.ks
 ```
 
 <a name="on-hosts-without-livecd-tools-os-x-windows-"></a>
@@ -56,7 +56,7 @@ $ cd centos-live-iso
 $ vagrant up
 $ vagrant ssh
 $ cd <path to centos-live-iso directory on the VM>/centos-live-iso
-$ livecd-creator --config ./centos-7-livedocker.cfg
+$ livecd-creator --config ./centos-7-minimal.ks
 ```
 
 <a name="further-reading"></a>
