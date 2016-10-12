@@ -71,8 +71,8 @@ syslinux
 
 %post
 
-LANG="en_US"
-echo "%_install_lang $LANG" > /etc/rpm/macros.image-language-conf
+# Fix locale issue (same way it happen in boot2docker)
+echo "LANG=\"C\"" > /etc/locale.conf
 
 # sudo permission
 echo "%docker ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/docker
@@ -82,11 +82,6 @@ cat > /etc/rc.d/init.d/handle-user-data << EOF
 #!/bin/sh
 LABEL=boot2docker-data
 MAGIC="boot2docker, please format-me"
-
-# TODO Generate Locale. This needs further investigation. I'd prefer to disable
-# 'AcceptEnv LANG LC_*'' in '/etc/ssh/sshd_config', but it did not work initially
-# https://github.com/LalatenduMohanty/centos-live-iso/issues/8
-localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 
 # TODO Why can I not generate the docker user outside of this init script as part
 # of the kickstart file?
