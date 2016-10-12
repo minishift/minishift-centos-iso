@@ -26,14 +26,15 @@ shutdown
 @core
 bash
 centos-logos
-curl
 docker
 dracut
+e4fsprogs
 efibootmgr
 grub2
 grub2-efi
 kernel
 net-tools
+parted
 shadow-utils
 shim
 syslinux
@@ -41,8 +42,6 @@ syslinux
 #Packages to be removed
 -aic94xx-firmware
 -alsa-firmware
--btrfs-progs
--e2fsprogs
 -iprutils
 -ivtv-firmware
 -iwl100-firmware
