@@ -71,7 +71,7 @@ syslinux
 
 %post
 
-# Fix locale issue (same way it happen in boot2docker)
+# Setting a global Locale for the server
 echo "LANG=\"C\"" > /etc/locale.conf
 
 # sudo permission
