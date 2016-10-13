@@ -33,7 +33,7 @@
 ```
 $ git clone https://github.com/LalatenduMohanty/centos-live-iso.git
 $ cd centos-live-iso
-$ livecd-creator --config ./centos-7-minimal.ks --fslabel live-centos
+$ ./create_live_iso
 ```
 
 <a name="on-hosts-without-livecd-tools-os-x-windows-"></a>
@@ -56,7 +56,7 @@ $ cd centos-live-iso
 $ vagrant up
 $ vagrant ssh
 $ cd <path to centos-live-iso directory on the VM>/centos-live-iso
-$ sudo livecd-creator --config ./centos-7-minimal.ks --fslabel live-centos
+$ sudo ./create_live_iso
 ```
 
 <a name="further-reading"></a>

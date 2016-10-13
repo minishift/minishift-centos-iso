@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# you can specify any addition file same way and make a entry to template
+export handle_user_data=`base64 -w 0 handle-user-data`
+
+#sed -i.back "/^cat > handle-user-data.base64 << EOF/{s/.*/&\n$bas64_str/;:a;n;ba}" centos-7-minimal.ks
+
+kickstart_file="centos-7-minimal.ks"
+
+if [ -f "$kickstart_file" ] ; then
+    rm $kickstart_file
+fi
+
+touch $kickstart_file
+
+envsubst < centos-7-minimal.template > centos-7-minimal.ks
+
+livecd-creator --config ./centos-7-minimal.ks --fslabel live-centos

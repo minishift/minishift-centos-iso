@@ -1,0 +1,27 @@
+#!/bin/sh
+LABEL=boot2docker-data
+MAGIC="boot2docker, please format-me"
+
+# TODO Need to make sure to have /sbin on the PATH. Is there a better way?
+# http://stackoverflow.com/questions/19983710/some-commands-not-wroking-on-remote-servers-through-ssh-shell
+# https://github.com/LalatenduMohanty/centos-live-iso/issues/11
+echo 'PATH=$PATH:/sbin' >> /home/docker/.bashrc
+
+# If there is a partition with `boot2docker-data` as its label we are dealing with
+# an already bootstrapped docker-machine.
+BOOT2DOCKER_DATA=`blkid -o device -l -t LABEL=$LABEL`
+if [ -n "$BOOT2DOCKER_DATA" ]; then
+    exit 0
+fi
+
+# Test for our magic string (it means that the disk was made by ./boot2docker init)
+HEADER=`dd if=/dev/sda bs=1 count=${#MAGIC} 2>/dev/null`
+
+if [ "$HEADER" = "$MAGIC" ]; then
+    # Read /userdata.tar with ssh keys
+    # TODO we need to add checks whether the userdata.tar is still there or whether
+    # the disk got already formatted
+    dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
+    tar xf /userdata.tar -C /home/docker/ > /var/log/userdata.log 2>&1
+    chown -R docker:docker /home/docker/.ssh
+fi
