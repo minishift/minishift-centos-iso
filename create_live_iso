@@ -13,4 +13,4 @@ touch $kickstart_file
 
 envsubst < centos-7-minimal.template > centos-7-minimal.ks
 
-#livecd-creator --config ./centos-7-minimal.ks --fslabel live-centos
+livecd-creator --config ./centos-7-minimal.ks --fslabel live-centos
