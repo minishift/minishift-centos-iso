@@ -28,7 +28,6 @@ bash
 centos-logos
 docker
 dracut
-e4fsprogs
 efibootmgr
 grub2
 grub2-efi
@@ -92,6 +91,16 @@ chmod +x /etc/rc.d/init.d/handle-user-data
 
 chmod +x /etc/rc.d/rc.local
 echo "/etc/rc.d/init.d/handle-user-data" >> /etc/rc.d/rc.local
+
+# Adding docker.socker systemd unit file - https://github.com/docker/docker/issues/25098
+# TODO - Check why this is required
+cat > docker.socket.base64 << EOF
+${docker_socket}
+EOF
+
+base64 -d < docker.socket.base64 > docker.socket
+mv docker.socket /usr/lib/systemd/system/docker.socket
+systemctl enable docker.socket
 
 # Remove redhat-logo and firmware package to help with reduce box size
 yum remove -y redhat-logos linux-firmware
