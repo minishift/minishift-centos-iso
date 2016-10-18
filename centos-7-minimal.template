@@ -24,6 +24,7 @@ shutdown
 
 %packages  --excludedocs --instLangs=en
 @core
+openssl
 bash
 centos-logos
 docker
@@ -98,6 +99,46 @@ yum remove -y redhat-logos linux-firmware
 
 # Clear yum package and metadata cache
 yum clean all
+
+# Place holder cert generation script. This is needed to create certs when system
+# boots first time to make sure docker daemon running with cert enabled. On restart
+# this script will first check cert is already available or not.
+cat > cert-gen.sh.base64 << EOF
+${cert_gen}
+EOF
+
+base64 -d < cert-gen.sh.base64 > cert-gen.sh
+chmod +x cert-gen.sh
+mv cert-gen.sh /opt
+
+# This unit file will take precedence over unit file which present /usr location
+# and it have daemon running using cert so when restart happen then also docker
+# daemon works as expected.
+cat << EOF > /etc/systemd/system/docker.service
+[Unit]
+Description=Docker Application Container Engine
+After=network.target
+Requires=rc-local
+
+[Service]
+Type=notify
+ExecStartPre=/opt/cert-gen.sh
+ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver devicemapper --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem
+ExecReload=/bin/kill -s HUP
+MountFlags=slave
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Environment=
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable docker
 
 rm -rf /usr/lib/locale/locale-archive
 rm -rf /var/cache/yum/*

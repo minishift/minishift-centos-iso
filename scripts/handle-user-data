@@ -19,7 +19,7 @@ mount_data_partition() {
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
-    rm -rf /var/lib/docker /var/lib/boot2docker
+    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
     mkdir -p /var/lib
@@ -29,6 +29,9 @@ mount_data_partition() {
 
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
     ln -s /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
+
+    mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
+    ln -s /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
 
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
