@@ -1,21 +1,36 @@
-KICKSTART_FILE=centos-7-minimal.ks
-KICKSTART_TEMPLATE=centos-7-minimal.template
+CENTOS_KICKSTART_FILE=centos-7-minimal.ks
+CENTOS_KICKSTART_TEMPLATE=centos-7-minimal.template
+
+RHEL_KICKSTART_FILE=rhel-7-minimal.ks
+RHEL_KICKSTART_TEMPLATE=rhel-7-minimal.template
+
 
 BUILD_DIR=$(shell pwd)/build
-ISO_NAME=live-centos
+CENTOS_ISO_NAME=live-centos
+RHEL_ISO_NAME=live-rhel
 
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
 CERT_GEN=$(shell base64 -w 0 scripts/cert-gen.sh)
 
-default: iso
+default: centos_iso
 
 kickstart:
 	mkdir -p $(BUILD_DIR)
-	touch $(BUILD_DIR)/$(KICKSTART_FILE)
-	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' envsubst <  $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 
-iso: kickstart
+iso_creation: kickstart
+	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
+
+centos_iso: KICKSTART_FILE=$(CENTOS_KICKSTART_FILE)
+centos_iso: KICKSTART_TEMPLATE=$(CENTOS_KICKSTART_TEMPLATE)
+centos_iso: ISO_NAME=live-centos.iso
+centos_iso: iso_creation
+
+rhel_iso: KICKSTART_FILE=$(RHEL_KICKSTART_FILE)
+rhel_iso: KICKSTART_TEMPLATE=$(RHEL_KICKSTART_TEMPLATE)
+rhel_iso: ISO_NAME=live-rhel.iso
+rhel_iso: iso_creation
 
 clean:
 	rm -rf $(BUILD_DIR)
+
