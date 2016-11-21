@@ -16,6 +16,11 @@ clean:
 iso_creation: init
 	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
+	# http://askubuntu.com/questions/153833/why-cant-i-mount-the-ubuntu-12-04-installer-isos-in-mac-os-x
+	# http://www.syslinux.org/wiki/index.php?title=Doc/isolinux#HYBRID_CD-ROM.2FHARD_DISK_MODE
+	dd if=/dev/zero bs=2k count=1 of=${BUILD_DIR}/tmp.iso
+	dd if=$(BUILD_DIR)/$(ISO_NAME) bs=2k skip=1 >> ${BUILD_DIR}/tmp.iso
+	mv -f ${BUILD_DIR}/tmp.iso $(BUILD_DIR)/$(ISO_NAME)
 
 .PHONY: centos_iso
 centos_iso: KICKSTART_FILE=centos-7-minimal.ks
