@@ -1,0 +1,172 @@
+sshpw --username=root --plaintext centos
+# Firewall configuration
+firewall --disabled
+selinux --disabled
+
+# Use network installation
+url --url= ${rhel_tree_url}
+network --bootproto=dhcp --device=link --activate --onboot=on
+skipx
+rootpw --plaintext centos
+auth --useshadow --passalgo=sha512
+
+timezone --utc America/New_York
+bootloader --location=mbr --append="no_timer_check console=ttyS0 console=tty0"
+clearpart --all
+part / --fstype="ext4" --size=10240
+
+#Repos
+repo --name=base --baseurl=${base_repo_url}
+repo --name=updates --baseurl=${updates_repo_url}
+
+shutdown
+
+%packages  --excludedocs --instLangs=en
+@core
+openssl
+bash
+docker
+dracut
+e4fsprogs
+efibootmgr
+grub2
+grub2-efi
+kernel
+net-tools
+parted
+shadow-utils
+shim
+syslinux
+
+#Packages to be removed
+-aic94xx-firmware
+-alsa-firmware
+-iprutils
+-ivtv-firmware
+-iwl100-firmware
+-iwl1000-firmware
+-iwl105-firmware
+-iwl135-firmware
+-iwl2000-firmware
+-iwl2030-firmware
+-iwl3160-firmware
+-iwl3945-firmware
+-iwl4965-firmware
+-iwl5000-firmware
+-iwl5150-firmware
+-iwl6000-firmware
+-iwl6000g2a-firmware
+-iwl6000g2b-firmware
+-iwl6050-firmware
+-iwl7260-firmware
+-iwl7265-firmware
+-parted
+-postfix
+-rsyslog
+%end
+
+%post
+
+# Setting a global Locale for the server
+echo "LANG=\"C\"" > /etc/locale.conf
+
+# Add docker user with 'tcuser' password
+/usr/sbin/useradd -p '$1$AhiE7wa5$d8puTTTSvN7Hq3JgUvfLV/' docker
+/usr/sbin/usermod -a -G docker docker
+
+# sudo permission for docker user
+echo "%docker ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/docker
+sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
+
+# Network configuration to make sure eth0 works to connect with outer world
+cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+DEVICE="eth0"
+BOOTPROTO="dhcp"
+ONBOOT="yes"
+TYPE="Ethernet"
+PERSISTENT_DHCLIENT="yes"
+EOF
+
+# Network configuration to make sure eth1 works for machine
+cat > /etc/sysconfig/network-scripts/ifcfg-eth1 << EOF
+DEVICE="eth1"
+BOOTPROTO="dhcp"
+ONBOOT="yes"
+TYPE="Ethernet"
+PERSISTENT_DHCLIENT="yes"
+EOF
+
+# To make sure works without subscription
+cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch
+enabled=1
+gpgcheck=0
+#
+EOF
+
+# Place holder for base64 encrypt handle-user-data script
+cat > handle-user-data.base64 << EOF
+${handle_user_data}
+EOF
+
+base64 -d < handle-user-data.base64 > handle-user-data
+mv handle-user-data /etc/rc.d/init.d/
+
+chmod +x /etc/rc.d/init.d/handle-user-data
+/sbin/restorecon /etc/rc.d/init.d/handle-user-data
+
+chmod +x /etc/rc.d/rc.local
+echo "/etc/rc.d/init.d/handle-user-data" >> /etc/rc.d/rc.local
+
+# Remove redhat-logo and firmware package to help with reduce box size
+yum remove -y redhat-logos linux-firmware
+
+# Clear yum package and metadata cache
+yum clean all
+
+# Place holder cert generation script. This is needed to create certs when system
+# boots first time to make sure docker daemon running with cert enabled. On restart
+# this script will first check cert is already available or not.
+cat > cert-gen.sh.base64 << EOF
+${cert_gen}
+EOF
+
+base64 -d < cert-gen.sh.base64 > cert-gen.sh
+chmod +x cert-gen.sh
+mv cert-gen.sh /opt
+
+# This unit file will take precedence over unit file which present /usr location
+# and it have daemon running using cert so when restart happen then also docker
+# daemon works as expected.
+cat << EOF > /etc/systemd/system/docker.service
+[Unit]
+Description=Docker Application Container Engine
+After=network.target
+Requires=rc-local
+
+[Service]
+Type=notify
+ExecStartPre=/opt/cert-gen.sh
+ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver devicemapper --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem
+ExecReload=/bin/kill -s HUP
+MountFlags=slave
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Environment=
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable docker
+
+rm -f /etc/resolv.conf
+rm -rf /usr/lib/locale/locale-archive
+rm -rf /var/cache/yum/*
+%end
