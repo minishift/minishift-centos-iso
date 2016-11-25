@@ -12,6 +12,19 @@ init:
 clean:
 	rm -rf $(BUILD_DIR)
 
+.PHONY: centos_iso
+centos_iso: KICKSTART_FILE=centos-7.ks
+centos_iso: KICKSTART_TEMPLATE=centos-7.template
+centos_iso: ISO_NAME=minishift-centos
+centos_iso: iso_creation
+
+.PHONY: rhel_iso
+rhel_iso: KICKSTART_FILE=rhel-7.ks
+rhel_iso: KICKSTART_TEMPLATE=rhel-7.template
+rhel_iso: ISO_NAME=minishift-rhel
+rhel_iso: check_env
+rhel_iso: iso_creation
+
 .PHONY: iso
 iso_creation: init
 	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
@@ -21,12 +34,6 @@ iso_creation: init
 	dd if=/dev/zero bs=2k count=1 of=${BUILD_DIR}/tmp.iso
 	dd if=$(BUILD_DIR)/$(ISO_NAME).iso bs=2k skip=1 >> ${BUILD_DIR}/tmp.iso
 	mv -f ${BUILD_DIR}/tmp.iso $(BUILD_DIR)/$(ISO_NAME).iso
-
-.PHONY: centos_iso
-centos_iso: KICKSTART_FILE=centos-7-minimal.ks
-centos_iso: KICKSTART_TEMPLATE=centos-7-minimal.template
-centos_iso: ISO_NAME=minishift-centos
-centos_iso: iso_creation
 
 .PHONY: check
 check_env:
@@ -40,11 +47,3 @@ check_env:
 		echo "updates_repo_url is undefined, Please check README"; \
 		exit 1; \
 	fi
-
-
-.PHONY: rhel_iso
-rhel_iso: KICKSTART_FILE=rhel-7-minimal.ks
-rhel_iso: KICKSTART_TEMPLATE=rhel-7-minimal.template
-rhel_iso: ISO_NAME=minishift-rhel
-rhel_iso: check_env
-rhel_iso: iso_creation
