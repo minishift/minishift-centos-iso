@@ -37,6 +37,7 @@ parted
 shadow-utils
 shim
 syslinux
+hyperv-daemons
 
 #Packages to be removed
 -aic94xx-firmware
@@ -143,8 +144,7 @@ mv cert-gen.sh /opt
 cat << EOF > /etc/systemd/system/docker.service
 [Unit]
 Description=Docker Application Container Engine
-After=network.target
-Requires=rc-local
+After=network.target rc-local.service
 
 [Service]
 Type=notify
