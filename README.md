@@ -1,4 +1,4 @@
-<a name="creating-a-centos-live-iso"></a>
+<a name="creating-a-minishift-centos-iso"></a>
 # Minishift CentOS VM
 
 This repository contains all the instructions and code to build a Live ISO based on CentOS
@@ -44,8 +44,8 @@ If you don't have _livecd-tools_, follow the
 #### Building the ISO
 
 ```
-$ git clone https://github.com/LalatenduMohanty/centos-live-iso.git
-$ cd centos-live-iso
+$ git clone https://github.com/minishift/minishift-centos-iso.git
+$ cd minishift-centos-iso
 $ make
 ```
 
@@ -64,11 +64,11 @@ $ make
 #### Building the ISO
 
 ```
-$ git clone https://github.com/LalatenduMohanty/centos-live-iso.git
-$ cd centos-live-iso
+$ git clone https://github.com/minishift/minishift-centos-iso.git
+$ cd minishift-centos-iso
 $ vagrant up
 $ vagrant ssh
-$ cd <path to centos-live-iso directory on the VM>/centos-live-iso
+$ cd <path to minishift-centos-iso directory on the VM>/minishift-centos-iso
 $ make
 ```
 
@@ -80,8 +80,8 @@ of CentOS. However, it requires you to have Red Hat VPN access and you need to e
 several environment variables prior to building:
 
 ```
-$ git clone https://github.com/LalatenduMohanty/centos-live-iso.git
-$ cd centos-live-iso
+$ git clone https://github.com/minishift/minishift-centos-iso.git
+$ cd minishift-centos-iso
 $ export rhel_tree_url="<rhel_tree_to_fetch_kernel>"
 $ export base_repo_url="<base_repo_url_to_install_packages>"
 $ export updates_repo_url="<updates_repo_url_to_package_updates>"
