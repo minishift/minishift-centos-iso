@@ -148,11 +148,19 @@ cat << EOF > /etc/systemd/system/docker.service
 [Unit]
 Description=Docker Application Container Engine
 After=network.target rc-local.service
+Requires=rhel-push-plugin.socket
 
 [Service]
 Type=notify
 ExecStartPre=/opt/cert-gen.sh
-ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver devicemapper --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem
+ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 \
+         --authorization-plugin=rhel-push-plugin \
+         --add-registry=registry.access.redhat.com \
+         -H unix:///var/run/docker.sock \
+         --storage-driver devicemapper \
+         --tlsverify --tlscacert /etc/docker/ca.pem \
+         --tlscert /etc/docker/server.pem \
+         --tlskey /etc/docker/server-key.pem
 ExecReload=/bin/kill -s HUP
 MountFlags=slave
 LimitNOFILE=infinity
@@ -168,6 +176,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl enable docker
+systemctl enable rhel-push-plugin
 
 rm -f /etc/resolv.conf
 rm -rf /usr/lib/locale/locale-archive
