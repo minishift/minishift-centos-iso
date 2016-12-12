@@ -47,3 +47,7 @@ check_env:
 		echo "updates_repo_url is undefined, Please check README"; \
 		exit 1; \
 	fi
+
+.PHONY: test
+test:
+	avocado run tests/test.py
