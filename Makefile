@@ -35,7 +35,7 @@ iso_creation: init
 	dd if=$(BUILD_DIR)/$(ISO_NAME).iso bs=2k skip=1 >> ${BUILD_DIR}/tmp.iso
 	mv -f ${BUILD_DIR}/tmp.iso $(BUILD_DIR)/$(ISO_NAME).iso
 
-.PHONY: check
+.PHONY: check_env
 check_env:
 	if test "$(rhel_tree_url)" = ""; then \
 		echo "rhel_tree_url is undefined, Please check README"; \
