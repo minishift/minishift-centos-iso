@@ -15,8 +15,8 @@ the boot2docker ISO.
 		- [Prerequisites](#prerequisites-1)
 		- [Building the ISO](#building-the-iso-1)
 - [Building the RHEL ISO](#building-the-rhel-iso)
+- [Releasing Minishift ISO](#releasing-minishift-iso)
 - [Further reading](#further-reading)
-
 <!-- /MarkdownTOC -->
 
 <a name="building-the-centos-iso"></a>
@@ -86,6 +86,19 @@ $ export rhel_tree_url="<rhel_tree_to_fetch_kernel>"
 $ export base_repo_url="<base_repo_url_to_install_packages>"
 $ export updates_repo_url="<updates_repo_url_to_package_updates>"
 $ make rhel_iso
+```
+
+<a name="releasing-minishift-iso"></a>
+## Releasing Minishift ISO
+
+- Assemble all the meaningful changes since the last release to create release notes.
+- Bump the `VERSION` variable in the Makefile.
+- Before you execute below command be sure to have a [Github personal access token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) defined in your environment as `GITHUB_ACCESS_TOKEN`.
+
+Run:
+
+```shell
+make release
 ```
 
 <a name="further-reading"></a>
