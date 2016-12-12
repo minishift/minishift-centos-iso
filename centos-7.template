@@ -89,6 +89,9 @@ cat > handle-user-data.base64 << EOF
 ${handle_user_data}
 EOF
 
+# minishift as variant for custom provisioner
+echo "VARIANT=\"minishift\"" >> /etc/os-release
+
 base64 -d < handle-user-data.base64 > handle-user-data
 mv handle-user-data /etc/rc.d/init.d/
 
