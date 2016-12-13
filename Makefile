@@ -26,7 +26,7 @@ rhel_iso: ISO_NAME=minishift-rhel
 rhel_iso: check_env
 rhel_iso: iso_creation
 
-.PHONY: iso
+.PHONY: iso_creation
 iso_creation: init
 	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' version='$(VERSION)' envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
