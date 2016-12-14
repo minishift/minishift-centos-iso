@@ -4,7 +4,7 @@ firewall --disabled
 selinux --disabled
 
 # Use network installation
-url --url= ${rhel_tree_url}
+url --url=${rhel_tree_url}
 network --bootproto=dhcp --device=link --activate --onboot=on
 skipx
 rootpw --plaintext centos
