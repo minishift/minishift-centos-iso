@@ -2,6 +2,11 @@ BUILD_DIR=$(shell pwd)/build
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
 CERT_GEN=$(shell base64 -w 0 scripts/cert-gen.sh)
 VERSION=1.0.0-alpha.1
+GITTAG=$(shell git rev-parse --short HEAD)
+TODAY=$(shell date +"%d%m%Y%H%M%S")
+ifndef BUILD_ID
+    BUILD_ID=local
+endif
 
 default: centos_iso
 
@@ -28,7 +33,8 @@ rhel_iso: iso_creation
 
 .PHONY: iso_creation
 iso_creation: init
-	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' version='$(VERSION)' envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
+	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
+			 envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
 	# http://askubuntu.com/questions/153833/why-cant-i-mount-the-ubuntu-12-04-installer-isos-in-mac-os-x
 	# http://www.syslinux.org/wiki/index.php?title=Doc/isolinux#HYBRID_CD-ROM.2FHARD_DISK_MODE
