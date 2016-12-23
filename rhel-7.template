@@ -38,6 +38,7 @@ shadow-utils
 shim
 syslinux
 hyperv-daemons
+cdk-entitlements
 
 #Packages to be removed
 -aic94xx-firmware
