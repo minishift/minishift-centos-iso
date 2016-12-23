@@ -97,16 +97,6 @@ TYPE="Ethernet"
 PERSISTENT_DHCLIENT="yes"
 EOF
 
-# To make sure works without subscription
-cat > /etc/yum.repos.d/epel.repo << EOF
-[epel]
-name=Extra Packages for Enterprise Linux 7 - $basearch
-mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch
-enabled=1
-gpgcheck=0
-#
-EOF
-
 # Place holder for base64 encrypt handle-user-data script
 cat > handle-user-data.base64 << EOF
 ${handle_user_data}
