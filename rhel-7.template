@@ -1,4 +1,4 @@
-sshpw --username=root --plaintext centos
+sshpw --username=root --plaintext redhat
 # Firewall configuration
 firewall --disabled
 selinux --disabled
