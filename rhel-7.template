@@ -19,6 +19,7 @@ part / --fstype="ext4" --size=10240
 #Repos
 repo --name=base --baseurl=${base_repo_url}
 repo --name=updates --baseurl=${updates_repo_url}
+repo --name=cdk --baseurl=${cdk_repo_url}
 
 shutdown
 
@@ -39,6 +40,7 @@ shadow-utils
 shim
 syslinux
 hyperv-daemons
+cdk-entitlements
 
 #Packages to be removed
 -aic94xx-firmware

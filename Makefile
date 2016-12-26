@@ -53,6 +53,9 @@ check_env:
 	elif test "$(updates_repo_url)" = ""; then \
 		echo "updates_repo_url is undefined, Please check README"; \
 		exit 1; \
+	elif test "$(cdk_repo_url)" = ""; then \
+		echo "cdk_repo_url is undefined, Please check README"; \
+		exit 1; \
 	fi
 
 .PHONY: get_gh-release
