@@ -85,6 +85,7 @@ $ cd minishift-centos-iso
 $ export rhel_tree_url="<rhel_tree_to_fetch_kernel>"
 $ export base_repo_url="<base_repo_url_to_install_packages>"
 $ export updates_repo_url="<updates_repo_url_to_package_updates>"
+$ export cdk_repo_url="<repo_url_to_cdk-entitlement_package>"
 $ make rhel_iso
 ```
 
