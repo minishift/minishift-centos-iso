@@ -5,13 +5,14 @@ selinux --disabled
 
 # Use network installation
 url --url="http://mirror.centos.org/centos/7/os/x86_64/"
-network --bootproto=dhcp --device=link --activate --onboot=on
+network --bootproto=dhcp --device=eth0 --activate --onboot=on
+network --bootproto=dhcp --device=eth1 --activate --onboot=on
 skipx
 rootpw --plaintext centos
 auth --useshadow --passalgo=sha512
 
 timezone --utc America/New_York
-bootloader --location=mbr --append="no_timer_check console=ttyS0 console=tty0"
+bootloader --location=mbr --append="no_timer_check console=ttyS0 console=tty0 net.ifnames=0 biosdevname=0"
 clearpart --all
 part / --fstype="ext4" --size=10240
 
