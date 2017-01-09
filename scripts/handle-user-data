@@ -19,7 +19,7 @@ mount_data_partition() {
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
-    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/origin
+    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
     if [ ! -d "/var/lib" ]; then
@@ -35,11 +35,8 @@ mount_data_partition() {
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
     ln -s /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
 
-    # Here we used bind mount because currently openshift doesn't work
-    # with symlink, refer: https://github.com/openshift/origin/issues/12029
-    mkdir -p /mnt/$PARTNAME/var/lib/origin
-    mkdir -p /var/lib/origin
-    mount --bind /mnt/$PARTNAME/var/lib/origin/ /var/lib/origin/
+    mkdir -p /mnt/$PARTNAME/var/lib/minishift
+    ln -s /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
 
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
