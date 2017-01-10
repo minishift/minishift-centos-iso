@@ -1,0 +1,22 @@
+- name: Enable centos-release-scl repo
+  yum: name=centos-release-scl state=latest
+
+- name: Setup libvirt
+  yum: name={{item}} state=present
+  with_items:
+      - qemu-kvm
+      - sclo-vagrant1-vagrant-libvirt
+
+- name: start-enable-libvirtd
+  service: name=libvirtd state=started enabled=yes
+
+- name: Install Development Tools
+  yum: name="@Development tools" state=present
+
+- name: Download Avocado repository
+  get_url:
+    url: https://repos-avocadoproject.rhcloud.com/static/avocado-el.repo
+    dest: /etc/yum.repos.d/avocado.repo
+
+- name: Install Avocado
+  yum: name=avocado state=present

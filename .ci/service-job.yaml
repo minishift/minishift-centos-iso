@@ -1,0 +1,76 @@
+- defaults:
+    name: 'global'
+    timeout: '15m'
+    jobdescription: "Minishift-centos-iso Jenkins Job"
+    git_organization: minishift
+    github_user: budhrg
+    wrappers:
+        - ansicolor
+        - workspace-cleanup
+        - timestamps
+
+- trigger:
+    name: githubprb
+    triggers:
+        - github-pull-request:
+              admin-list:
+                  - budhrg
+                  - hferentschik
+              cron: '* * * * *'
+              github-hooks: false
+              permit-all: false
+              trigger-phrase: '.*\[test\].*'
+              allow-whitelist-orgs-as-admins: true
+              status-context: "ci.centos.org PR build"
+- scm:
+    name: git-scm
+    scm:
+      - git:
+          url: "{git_url}"
+          skip-tag: "True"
+          git-tool: ci-git
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/*'
+          branches:
+              - '${{ghprbActualCommit}}'
+
+- job-template:
+    name: '{git_repo}'
+    description: |
+        {jobdescription}
+    node: "{ci_project}"
+    concurrent: true
+    properties:
+        - github:
+            url: https://github.com/{git_organization}/{git_repo}/
+    scm:
+        - git-scm:
+            git_url: https://{github_user}@github.com/{git_organization}/{git_repo}.git
+    triggers:
+        - githubprb
+    builders:
+        - shell: |
+              # testing out the cico client
+              set +e
+              export CICO_API_KEY=$(cat ~/duffy.key )
+              read CICO_hostname CICO_ssid <<< $(cico node get -f value -c ip_address -c comment)
+              sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+              ssh_cmd="ssh $sshopts $CICO_hostname"
+              env > jenkins-env
+              $ssh_cmd yum -y install rsync
+              git rebase origin/${{ghprbTargetBranch}} \
+              && rsync -e "ssh $sshopts" -Ha $(pwd)/ $CICO_hostname:payload \
+              && /usr/bin/timeout {timeout} $ssh_cmd -t "cd payload && /bin/bash cico_run_tests.sh"
+              rtn_code=$?
+              cico node done $CICO_ssid
+              if [[ $rtn_code -eq 124 ]]; then
+                 echo "BUILD TIMEOUT";
+              fi
+              exit $rtn_code
+
+- project:
+    name: minishift-centos-iso
+    jobs:
+      - '{git_repo}':
+          git_repo: minishift-centos-iso
+          ci_project: 'atomicapp'
+          timeout: '20m'

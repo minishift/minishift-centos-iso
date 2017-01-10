@@ -70,3 +70,7 @@ release: centos_iso get_gh-release
 	cp $(BUILD_DIR)/minishift-centos.iso release/
 	$(BUILD_DIR)/gh-release checksums sha256
 	$(BUILD_DIR)/gh-release create minishift/minishift-centos-iso $(VERSION) master v$(VERSION)
+
+.PHONY: test
+test:
+	avocado run --show-job-log tests/test.py

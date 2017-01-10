@@ -8,12 +8,12 @@ the boot2docker ISO.
 <!-- MarkdownTOC -->
 
 - [Building the CentOS ISO](#building-the-centos-iso)
-	- [On CentOS/Fedora](#on-centosfedora)
-		- [Prerequisites](#prerequisites)
-		- [Building the ISO](#building-the-iso)
-	- [On hosts without _livecd-tools_ \(OS X, Windows, ...\)](#on-hosts-without-livecd-tools-os-x-windows-)
-		- [Prerequisites](#prerequisites-1)
-		- [Building the ISO](#building-the-iso-1)
+  - [On CentOS/Fedora](#on-centosfedora)
+    - [Prerequisites](#prerequisites)
+    - [Building the ISO](#building-the-iso)
+  - [On hosts without _livecd-tools_ \(OS X, Windows, ...\)](#on-hosts-without-livecd-tools-os-x-windows-)
+    - [Prerequisites](#prerequisites-1)
+    - [Building the ISO](#building-the-iso-1)
 - [Building the RHEL ISO](#building-the-rhel-iso)
 - [Releasing Minishift ISO](#releasing-minishift-iso)
 - [Further reading](#further-reading)
@@ -101,6 +101,17 @@ Run:
 ```shell
 make release
 ```
+
+<a name="tests"></a>
+## Tests
+
+Tests are written as Python scripts under `tests` directory and run through [Avocado](avocado-framework.readthedocs.io) framework.
+
+To run the tests:
+```
+make test
+```
+**NOTE**: Ensure that you have ISO available for testing inside `build` directory. If absent, you can run `make`.
 
 <a name="further-reading"></a>
 ## Further reading
