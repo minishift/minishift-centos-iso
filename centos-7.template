@@ -129,7 +129,12 @@ After=network.target rc-local.service
 [Service]
 Type=notify
 ExecStartPre=/opt/cert-gen.sh
-ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver devicemapper --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem
+ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 \
+         -H unix:///var/run/docker.sock \
+         --storage-driver overlay \
+         --tlsverify --tlscacert /etc/docker/ca.pem \
+         --tlscert /etc/docker/server.pem \
+         --tlskey /etc/docker/server-key.pem
 ExecReload=/bin/kill -s HUP
 MountFlags=slave
 LimitNOFILE=infinity
