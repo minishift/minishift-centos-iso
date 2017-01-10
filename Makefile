@@ -1,7 +1,7 @@
 BUILD_DIR=$(shell pwd)/build
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
 CERT_GEN=$(shell base64 -w 0 scripts/cert-gen.sh)
-VERSION=1.0.0-alpha.1
+VERSION=1.0.0-beta.1
 GITTAG=$(shell git rev-parse --short HEAD)
 TODAY=$(shell date +"%d%m%Y%H%M%S")
 ifndef BUILD_ID
