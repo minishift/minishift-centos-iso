@@ -27,6 +27,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", inline: <<-SHELL
-    sudo yum install -y git livecd-tools
+    # Docker and parted is required to get selinux context: https://bugzilla.redhat.com/show_bug.cgi?id=1303565
+    sudo yum install -y git livecd-tools docker parted
   SHELL
 end

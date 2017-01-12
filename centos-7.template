@@ -1,7 +1,7 @@
 sshpw --username=root --plaintext centos
 # Firewall configuration
 firewall --disabled
-selinux --disabled
+selinux --enforcing
 
 # Use network installation
 url --url="http://mirror.centos.org/centos/7/os/x86_64/"
@@ -64,7 +64,6 @@ hyperv-daemons
 -iwl6050-firmware
 -iwl7260-firmware
 -iwl7265-firmware
--parted
 -postfix
 -rsyslog
 %end
@@ -129,7 +128,13 @@ After=network.target rc-local.service
 [Service]
 Type=notify
 ExecStartPre=/opt/cert-gen.sh
-ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --storage-driver devicemapper --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem
+ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 \
+                       -H unix:///var/run/docker.sock \
+                       --selinux-enabled \
+                       --storage-driver devicemapper \
+                       --tlsverify --tlscacert /etc/docker/ca.pem \
+                       --tlscert /etc/docker/server.pem \
+                       --tlskey /etc/docker/server-key.pem
 ExecReload=/bin/kill -s HUP
 MountFlags=slave
 LimitNOFILE=infinity
