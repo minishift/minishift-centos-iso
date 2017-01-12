@@ -1,7 +1,7 @@
 sshpw --username=root --plaintext redhat
 # Firewall configuration
 firewall --disabled
-selinux --disabled
+selinux --enforcing
 
 # Use network installation
 url --url=${rhel_tree_url}
@@ -64,7 +64,6 @@ cdk-entitlements
 -iwl6050-firmware
 -iwl7260-firmware
 -iwl7265-firmware
--parted
 -postfix
 -rsyslog
 %end
@@ -150,6 +149,7 @@ Type=notify
 ExecStartPre=/opt/cert-gen.sh
 ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 \
          --authorization-plugin=rhel-push-plugin \
+         --selinux-enabled \
          --add-registry=registry.access.redhat.com \
          -H unix:///var/run/docker.sock \
          --storage-driver devicemapper \

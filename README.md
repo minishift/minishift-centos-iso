@@ -8,10 +8,10 @@ the boot2docker ISO.
 <!-- MarkdownTOC -->
 
 - [Building the CentOS ISO](#building-the-centos-iso)
-	- [On CentOS/Fedora](#on-centosfedora)
+	- [On CentOS-7](#on-centos)
 		- [Prerequisites](#prerequisites)
 		- [Building the ISO](#building-the-iso)
-	- [On hosts without _livecd-tools_ \(OS X, Windows, ...\)](#on-hosts-without-livecd-tools-os-x-windows-)
+	- [On hosts _other than CentOS-7_ \(OS X, Windows, Fedora ...\)](#non-centos7-hosts)
 		- [Prerequisites](#prerequisites-1)
 		- [Building the ISO](#building-the-iso-1)
 - [Building the RHEL ISO](#building-the-rhel-iso)
@@ -22,22 +22,27 @@ the boot2docker ISO.
 <a name="building-the-centos-iso"></a>
 ## Building the CentOS ISO
 
-The following contains instructions on how to build the default (CentOS based) ISO.
+The following contains instructions on how to build the default (CentOS7 based) ISO.
 If you are able to install [livecd-tools](https://github.com/rhinstaller/livecd-tools)
-directly on your machine, you can use the [CentOS/Fedora](#on-centosfedora) instructions.
+directly on your machine, you can use the [CentOS](#on-centos) instructions.
 
-If you don't have _livecd-tools_, follow the
-[hosts without livecd-tools](#on-hosts-without-livecd-tools-os-x-windows-) instructions.
+If you don't have _livecd-tools or using different linux distro other than centos_, follow the
+[hosts other than CentOS-7](#non-centos7-hosts) instructions.
 
-<a name="on-centosfedora"></a>
-### On CentOS/Fedora
+<a name="on-centos"></a>
+### On CentOS
 
 <a name="prerequisites"></a>
 #### Prerequisites
+* Update your system before start and if there is kernel update then reboot your system to activate latest kernel.
 
-* [livecd-tools](https://github.com/rhinstaller/livecd-tools)
+        $ yum update -y
 
-        $ yum install -y livecd-tools
+* [Install livecd-tools](https://github.com/rhinstaller/livecd-tools)
+
+  Note: We use to have docker installed on system to get selinux context, [check bugzilla](https://bugzilla.redhat.com/show_bug.cgi?id=1303565)
+
+        $ yum install -y livecd-tools docker
 
 
 <a name="building-the-iso"></a>
@@ -49,8 +54,8 @@ $ cd minishift-centos-iso
 $ make
 ```
 
-<a name="on-hosts-without-livecd-tools-os-x-windows-"></a>
-### On hosts without _livecd-tools_ (OS X, Windows, ...)
+<a name="non-centos7-hosts"></a>
+### On hosts _other than CentOS-7_ (OS X, Windows, Fedora ...)
 
 <a name="prerequisites-1"></a>
 #### Prerequisites
