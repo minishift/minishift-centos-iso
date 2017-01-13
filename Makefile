@@ -21,13 +21,13 @@ clean:
 .PHONY: centos_iso
 centos_iso: KICKSTART_FILE=centos-7.ks
 centos_iso: KICKSTART_TEMPLATE=centos-7.template
-centos_iso: ISO_NAME=minishift-centos
+centos_iso: ISO_NAME=minishift-centos7
 centos_iso: iso_creation
 
 .PHONY: rhel_iso
 rhel_iso: KICKSTART_FILE=rhel-7.ks
 rhel_iso: KICKSTART_TEMPLATE=rhel-7.template
-rhel_iso: ISO_NAME=minishift-rhel
+rhel_iso: ISO_NAME=minishift-rhel7
 rhel_iso: check_env
 rhel_iso: iso_creation
 
