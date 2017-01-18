@@ -16,19 +16,20 @@ if [ -e "jenkins-env" ]; then
   source ~/.jenkins-env
 fi
 
-# We need to disable selinux for now, XXX
-/usr/sbin/setenforce 0
-
 # Get all the deps in
 yum -y install \
   make \
   git \
   epel-release \
   livecd-tools \
-  curl
+  curl \
+  docker \
+  parted \
+  kvm \
+  qemu-kvm \
+  libvirt
 
-# Install Libvirt
-sudo yum -y install kvm qemu-kvm libvirt
+# Start Libvirt
 sudo systemctl start libvirtd
 
 # Install Avocado
