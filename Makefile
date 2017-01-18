@@ -10,28 +10,23 @@ endif
 
 default: centos_iso
 
-.PHONY: init
 init:
 	mkdir -p $(BUILD_DIR)
 
-.PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: centos_iso
 centos_iso: KICKSTART_FILE=centos-7.ks
 centos_iso: KICKSTART_TEMPLATE=centos-7.template
 centos_iso: ISO_NAME=minishift-centos7
 centos_iso: iso_creation
 
-.PHONY: rhel_iso
 rhel_iso: KICKSTART_FILE=rhel-7.ks
 rhel_iso: KICKSTART_TEMPLATE=rhel-7.template
 rhel_iso: ISO_NAME=minishift-rhel7
 rhel_iso: check_env
 rhel_iso: iso_creation
 
-.PHONY: iso_creation
 iso_creation: init
 	handle_user_data='$(HANDLE_USER_DATA)' cert_gen='$(CERT_GEN)' version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
 			 envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
@@ -42,7 +37,6 @@ iso_creation: init
 	dd if=$(BUILD_DIR)/$(ISO_NAME).iso bs=2k skip=1 >> ${BUILD_DIR}/tmp.iso
 	mv -f ${BUILD_DIR}/tmp.iso $(BUILD_DIR)/$(ISO_NAME).iso
 
-.PHONY: check_env
 check_env:
 	if test "$(rhel_tree_url)" = ""; then \
 		echo "rhel_tree_url is undefined, Please check README"; \
@@ -58,15 +52,15 @@ check_env:
 		exit 1; \
 	fi
 
-.PHONY: get_gh-release
 get_gh-release: init
 	curl -sL https://github.com/progrium/gh-release/releases/download/v2.2.1/gh-release_2.2.1_linux_x86_64.tgz > $(BUILD_DIR)/gh-release_2.2.1_linux_x86_64.tgz
 	tar -xvf $(BUILD_DIR)/gh-release_2.2.1_linux_x86_64.tgz -C $(BUILD_DIR)
 	rm -fr $(BUILD_DIR)/gh-release_2.2.1_linux_x86_64.tgz
 
-.PHONY: release
 release: centos_iso get_gh-release
 	rm -rf release && mkdir -p release
 	cp $(BUILD_DIR)/minishift-centos.iso release/
 	$(BUILD_DIR)/gh-release checksums sha256
 	$(BUILD_DIR)/gh-release create minishift/minishift-centos-iso $(VERSION) master v$(VERSION)
+
+.PHONY: init clean centos_iso rhel_iso iso_creation check_env get_gh-release release
