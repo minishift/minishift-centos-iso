@@ -1,9 +1,13 @@
 BUILD_DIR=$(shell pwd)/build
+BIN_DIR=$(BUILD_DIR)/bin
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
 CERT_GEN=$(shell base64 -w 0 scripts/cert-gen.sh)
 VERSION=1.0.0-beta.1
 GITTAG=$(shell git rev-parse --short HEAD)
 TODAY=$(shell date +"%d%m%Y%H%M%S")
+MINISHIFT_LATEST_URL=$(shell python tests/utils/minishift_latest_version.py)
+ARCHIVE_FILE=$(shell echo $(MINISHIFT_LATEST_URL) | rev | cut -d/ -f1 | rev)
+
 ifndef BUILD_ID
     BUILD_ID=local
 endif
@@ -70,3 +74,15 @@ release: centos_iso get_gh-release
 	cp $(BUILD_DIR)/minishift-centos.iso release/
 	$(BUILD_DIR)/gh-release checksums sha256
 	$(BUILD_DIR)/gh-release create minishift/minishift-centos-iso $(VERSION) master v$(VERSION)
+
+$(BIN_DIR)/minishift:
+	@echo "Downloading latest minishift binary..."
+	@mkdir -p $(BIN_DIR)
+	@cd $(BIN_DIR) && \
+	curl -LO --progress-bar $(MINISHIFT_LATEST_URL) && \
+	tar xzf $(ARCHIVE_FILE)
+	@echo "Done."
+
+.PHONY: test
+test: $(BIN_DIR)/minishift
+	avocado run $(SHOW_LOG) tests/test.py
