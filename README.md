@@ -5,6 +5,8 @@ This repository contains all the instructions and code to build a Live ISO based
 which can be used by [minishift](https://github.com/minishift/minishift) as an alternative to
 the boot2docker ISO.
 
+----
+
 <!-- MarkdownTOC -->
 
 - [Building the CentOS ISO](#building-the-centos-iso)
@@ -18,7 +20,12 @@ the boot2docker ISO.
 - [Releasing Minishift ISO](#releasing-minishift-iso)
 - [Tests](#tests)
 - [Further reading](#further-reading)
+
 <!-- /MarkdownTOC -->
+
+[![Build Status](https://ci.centos.org/buildStatus/icon?job=minishift-centos-iso)](https://ci.centos.org/job/minishift-centos-iso/)
+
+----
 
 <a name="building-the-centos-iso"></a>
 ## Building the CentOS ISO
