@@ -117,6 +117,9 @@ base64 -d < cert-gen.sh.base64 > cert-gen.sh
 chmod +x cert-gen.sh
 mv cert-gen.sh /opt
 
+# Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1414250
+ln -s /usr/bin/dockerd-current /usr/bin/dockerd
+
 # This unit file will take precedence over unit file which present /usr location
 # and it have daemon running using cert so when restart happen then also docker
 # daemon works as expected.
@@ -131,6 +134,8 @@ ExecStartPre=/opt/cert-gen.sh
 ExecStart=/usr/bin/docker daemon -H tcp://0.0.0.0:2376 \
                        -H unix:///var/run/docker.sock \
                        --selinux-enabled \
+                       --add-runtime docker-runc=/usr/libexec/docker/docker-runc-current \
+                       --default-runtime=docker-runc \
                        --storage-driver devicemapper \
                        --tlsverify --tlscacert /etc/docker/ca.pem \
                        --tlscert /etc/docker/server.pem \
