@@ -4,8 +4,8 @@ LABEL=boot2docker-data
 MAGIC="boot2docker, please format-me"
 UNPARTITIONED_HD=/dev/sda
 
-# Function to mount the data partition
-mount_data_partition() {
+# Function to mount partitions
+mount_partitions() {
     PARTNAME=`echo "$BOOT2DOCKER_DATA" | sed 's/.*\///'`
     echo "mount p:$PARTNAME ..."
     mkdir -p /mnt/$PARTNAME
@@ -16,6 +16,10 @@ mount_data_partition() {
         umount -f /mnt/$PARTNAME || true
         mount $BOOT2DOCKER_DATA /mnt/$PARTNAME
     fi
+
+    # Activate swap partition
+    echo "activate swap ..."
+    swapon "${UNPARTITIONED_HD}2"
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
@@ -52,7 +56,7 @@ mount_data_partition() {
 }
 
 # Function to partion and format the data disk
-prepare_data_partion() {
+prepare_partions() {
     # Create the partition, format it and then mount it
     echo "NEW boot2docker managed disk image ($UNPARTITIONED_HD): formatting it for use"
 
@@ -71,7 +75,7 @@ prepare_data_partion() {
         sleep 0.5
     done
 
-    # Activate the swap partition
+    # Prepare the swap partition
     mkswap "${UNPARTITIONED_HD}2"
 
     # Add the data partition
@@ -87,7 +91,6 @@ prepare_data_partion() {
 
     BOOT2DOCKER_DATA=`echo "${UNPARTITIONED_HD}1"`
     mkfs.ext4 -i 8192 -L $LABEL $BOOT2DOCKER_DATA
-    swapon "${UNPARTITIONED_HD}2"
 }
 
 # Function to extract userdata.tar containing the ssh keys into the home directory /home/docker
@@ -113,7 +116,7 @@ echo 'PATH=$PATH:/sbin' >> /home/docker/.bashrc
 # userdata.tar. Remember, /home/docker is not persistent
 BOOT2DOCKER_DATA=`blkid -o device -l -t LABEL=$LABEL`
 if [ -n "$BOOT2DOCKER_DATA" ]; then
-	mount_data_partition
+	mount_partitions
 	handle_user_data
 	exit 0
 fi
@@ -124,7 +127,7 @@ if [ "$HEADER" = "$MAGIC" ]; then
 	# Read /userdata.tar with ssh keys and place it temporarily under /
 	dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
 
-    prepare_data_partion
-    mount_data_partition
+    prepare_partions
+    mount_partitions
     handle_user_data
 fi

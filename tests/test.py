@@ -74,6 +74,17 @@ class MinishiftISOTest(Test):
         self.assertEqual(0, process.returncode)
         self.assertEqual('Stopped', output.rstrip())
 
+    def test_swapspace(self):
+        ''' Test if swap space is available on restart '''
+        cmd = self.bin_dir + "minishift start"
+        self.execute_test({ 'cmd': cmd })
+    
+        # Check swap space
+        cmd = self.bin_dir + "minishift ssh \"echo `free | tail -n 1 | awk '{print $2}'`\""
+        self.log.info("Executing command : %s" % cmd)
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertNotEqual(0, output)
+
     def test_delete_vm(self):
         ''' Test removing machine '''
         cmd = self.bin_dir + "minishift delete"
