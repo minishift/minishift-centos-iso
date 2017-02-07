@@ -40,6 +40,7 @@ shadow-utils
 shim
 syslinux
 hyperv-daemons
+cifs-utils
 cdk-entitlements
 
 #Packages to be removed
