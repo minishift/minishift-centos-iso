@@ -56,6 +56,11 @@ class MinishiftISOTest(Test):
         output = self.execute_test({ 'cmd': cmd })
         self.check_data_evaluable(output.rstrip())
 
+    def test_cifs_mount(self):
+        cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.cifs -V'"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual('mount.cifs version: 6.2', output.rstrip())
+
     def test_stopping_vm(self):
         ''' Test stopping machine '''
         cmd = self.bin_dir + "minishift stop"

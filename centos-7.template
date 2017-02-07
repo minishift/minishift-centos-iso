@@ -41,6 +41,7 @@ shadow-utils
 shim
 syslinux
 hyperv-daemons
+cifs-utils
 
 #Packages to be removed
 -aic94xx-firmware
