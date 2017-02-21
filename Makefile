@@ -71,7 +71,7 @@ get_gh-release: init
 .PHONY: release
 release: centos_iso get_gh-release
 	rm -rf release && mkdir -p release
-	cp $(BUILD_DIR)/minishift-centos.iso release/
+	cp $(BUILD_DIR)/minishift-centos7.iso release/
 	$(BUILD_DIR)/gh-release checksums sha256
 	$(BUILD_DIR)/gh-release create minishift/minishift-centos-iso $(VERSION) master v$(VERSION)
 
