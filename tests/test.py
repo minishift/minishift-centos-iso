@@ -56,10 +56,15 @@ class MinishiftISOTest(Test):
         output = self.execute_test({ 'cmd': cmd })
         self.check_data_evaluable(output.rstrip())
 
-    def test_cifs_mount(self):
+    def test_cifs_installed(self):
         cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.cifs -V'"
         output = self.execute_test({ 'cmd': cmd })
         self.assertEqual('mount.cifs version: 6.2', output.rstrip())
+
+    def test_sshfs_installed(self):
+        cmd = self.bin_dir + "minishift ssh 'sudo sshfs -V'"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertRegexpMatches(output.rstrip(), r'.*SSHFS version 2\.5.*')
 
     def test_stopping_vm(self):
         ''' Test stopping machine '''
@@ -78,7 +83,7 @@ class MinishiftISOTest(Test):
         ''' Test if swap space is available on restart '''
         cmd = self.bin_dir + "minishift start"
         self.execute_test({ 'cmd': cmd })
-    
+
         # Check swap space
         cmd = self.bin_dir + "minishift ssh \"echo `free | tail -n 1 | awk '{print $2}'`\""
         self.log.info("Executing command : %s" % cmd)
