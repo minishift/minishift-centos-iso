@@ -42,6 +42,7 @@ syslinux
 hyperv-daemons
 cifs-utils
 cdk-entitlements
+fuse-sshfs
 
 #Packages to be removed
 -aic94xx-firmware
