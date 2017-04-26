@@ -3,18 +3,19 @@
 LABEL=boot2docker-data
 MAGIC="boot2docker, please format-me"
 UNPARTITIONED_HD=/dev/sda
+MOUNTPOINT_DATA=/mnt/data
 
-# Function to mount partitions
+# Function to mount the data partition
 mount_partitions() {
-    PARTNAME=`echo "$BOOT2DOCKER_DATA" | sed 's/.*\///'`
-    echo "mount p:$PARTNAME ..."
-    mkdir -p /mnt/$PARTNAME
-    if ! mount $BOOT2DOCKER_DATA /mnt/$PARTNAME 2>/dev/null; then
+    LVMNAME=`echo "$BOOT2DOCKER_DATA" | sed 's/.*\///'`
+    echo "mount p:$LVMNAME ..."
+    mkdir -p $MOUNTPOINT_DATA
+    if ! mount $BOOT2DOCKER_DATA $MOUNTPOINT_DATA 2>/dev/null; then
         # for some reason, mount doesn't like to modprobe btrfs
         BOOT2DOCKER_FSTYPE=`blkid -o export $BOOT2DOCKER_DATA | grep TYPE= | cut -d= -f2`
         modprobe $BOOT2DOCKER_FSTYPE || true
-        umount -f /mnt/$PARTNAME || true
-        mount $BOOT2DOCKER_DATA /mnt/$PARTNAME
+        umount -f $MOUNTPOINT_DATA || true
+        mount $BOOT2DOCKER_DATA $MOUNTPOINT_DATA
     fi
 
     # Activate swap partition
@@ -30,29 +31,33 @@ mount_partitions() {
         mkdir -p /var/lib
     fi
 
-    mkdir -p /mnt/$PARTNAME/var/lib/docker
-    ln -s /mnt/$PARTNAME/var/lib/docker /var/lib/docker
+    mkdir -p $MOUNTPOINT_DATA/var/lib/docker
+    ln -s $MOUNTPOINT_DATA/var/lib/docker /var/lib/docker
 
-    mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
-    ln -s /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
+    mkdir -p $MOUNTPOINT_DATA/var/lib/boot2docker
+    ln -s $MOUNTPOINT_DATA/var/lib/boot2docker /var/lib/boot2docker
 
-    mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
-    ln -s /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
+    mkdir -p $MOUNTPOINT_DATA/var/lib/boot2docker/etc/docker
+    ln -s $MOUNTPOINT_DATA/var/lib/boot2docker/etc/docker /etc/docker
 
-    mkdir -p /mnt/$PARTNAME/var/lib/minishift
-    ln -s /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
+    mkdir -p $MOUNTPOINT_DATA/var/lib/minishift
+    ln -s $MOUNTPOINT_DATA/var/lib/minishift /var/lib/minishift
 
     # Make sure /tmp is on the disk too
-    rm -rf /mnt/$PARTNAME/tmp || true
-    mv /tmp /mnt/$PARTNAME/tmp
-    ln -fs /mnt/$PARTNAME/tmp /tmp
+    rm -rf $MOUNTPOINT_DATA/tmp || true
+    mv /tmp $MOUNTPOINT_DATA/tmp
+    ln -fs $MOUNTPOINT_DATA/tmp /tmp
 
     # Move userdata to persistent storage
     if [ -e "/userdata.tar" ]; then
         mv /userdata.tar /var/lib/boot2docker/
     fi
 
-    ls -l /mnt/$PARTNAME
+    ls -l $MOUNTPOINT_DATA
+
+    # Setup docker storage
+    echo "VG=minishift_vg" >> /etc/sysconfig/docker-storage-setup
+    docker-storage-setup
 }
 
 # Function to partion and format the data disk
@@ -61,49 +66,47 @@ prepare_partions() {
     echo "NEW boot2docker managed disk image ($UNPARTITIONED_HD): formatting it for use"
 
     # Add a swap partition (so Docker doesn't complain about it missing)
-    (echo n; echo p; echo 2; echo ; echo +1000M ; echo w) | fdisk $UNPARTITIONED_HD
-    # Let kernel re-read partition table
+    (echo n; echo p; echo 2; echo ; echo +1000M ; echo t; echo 82; echo w) | fdisk $UNPARTITIONED_HD
     partprobe
 
-    (echo t; echo 82; echo w) | fdisk $UNPARTITIONED_HD
-    # Let kernel re-read partition table
-    partprobe
-    # wait for the partition to actually exist, timeout after about 5 seconds
     local timer=0
     while [ "$timer" -lt 10 -a ! -b "${UNPARTITIONED_HD}2" ]; do
     	timer=$((timer + 1))
         sleep 0.5
     done
 
-    # Prepare the swap partition
-    mkswap "${UNPARTITIONED_HD}2"
-
-    # Add the data partition
-    (echo n; echo p; echo 1; echo ; echo ; echo w) | fdisk $UNPARTITIONED_HD
-    # Let kernel re-read partition table
+    # Add the lvm partition
+    (echo n; echo p; echo 1; echo ; echo ; echo t; echo 1; echo 8e; echo w) | fdisk $UNPARTITIONED_HD
     partprobe
-    # wait for the partition to actually exist, timeout after about 5 seconds
+
     timer=0
     while [ "$timer" -lt 10 -a ! -b "${UNPARTITIONED_HD}1" ]; do
     	timer=$((timer + 1))
         sleep 0.5
     done
+    
+    # Create LVM layout
+    BOOT2DOCKER_LVM=`echo "${UNPARTITIONED_HD}1"`
+    vgcreate -y minishift_vg $BOOT2DOCKER_LVM
+    lvcreate -L 10G -n data minishift_vg
+    BOOT2DOCKER_DATA=/dev/minishift_vg/data
+    mkfs.ext4 -L $LABEL $BOOT2DOCKER_DATA
 
-    BOOT2DOCKER_DATA=`echo "${UNPARTITIONED_HD}1"`
-    mkfs.ext4 -i 8192 -L $LABEL $BOOT2DOCKER_DATA
+    # Prepare the swap partition
+    mkswap "${UNPARTITIONED_HD}2"
 }
 
 # Function to extract userdata.tar containing the ssh keys into the home directory /home/docker
 handle_user_data() {
-	# Extract the userdata into docker user home directory
-	if [ -e "/var/lib/boot2docker/userdata.tar" ]; then
-		tar xf /var/lib/boot2docker/userdata.tar -C /home/docker/ > /var/log/userdata.log 2>&1
-    	rm -f '/home/docker/boot2docker, please format-me'
-		chown -R docker:docker /home/docker/.ssh
-	else
-		echo "Unable to find userdata.tar"
-		exit 1
-	fi
+    # Extract the userdata into docker user home directory
+    if [ -e "/var/lib/boot2docker/userdata.tar" ]; then
+        tar xf /var/lib/boot2docker/userdata.tar -C /home/docker/ > /var/log/userdata.log 2>&1
+        rm -f '/home/docker/boot2docker, please format-me'
+        chown -R docker:docker /home/docker/.ssh
+    else
+        echo "Unable to find userdata.tar"
+        exit 1
+    fi
 }
 
 # TODO Need to make sure to have /sbin on the PATH. Is there a better way?
@@ -116,16 +119,16 @@ echo 'PATH=$PATH:/sbin' >> /home/docker/.bashrc
 # userdata.tar. Remember, /home/docker is not persistent
 BOOT2DOCKER_DATA=`blkid -o device -l -t LABEL=$LABEL`
 if [ -n "$BOOT2DOCKER_DATA" ]; then
-	mount_partitions
-	handle_user_data
-	exit 0
+    mount_partitions
+    handle_user_data
+    exit 0
 fi
 
 # Test for our magic string (it means that the disk was made by ./boot2docker init)
 HEADER=`dd if=$UNPARTITIONED_HD bs=1 count=${#MAGIC} 2>/dev/null`
 if [ "$HEADER" = "$MAGIC" ]; then
-	# Read /userdata.tar with ssh keys and place it temporarily under /
-	dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
+    # Read /userdata.tar with ssh keys and place it temporarily under /
+    dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
 
     prepare_partions
     mount_partitions
