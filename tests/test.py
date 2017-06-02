@@ -14,10 +14,6 @@ class MinishiftISOTest(Test):
 
     def setUp(self):
         ''' Test Setup '''
-        self.log.info("################################################################")
-        self.log.info("Avocado version : %s" % VERSION)
-        self.log.info("################################################################")
-
         self.repo_dir = os.path.dirname(os.path.realpath(__file__)) + "/.."
         self.scripts_dir = self.repo_dir + "/tests/"
         self.bin_dir = self.repo_dir + "/build/bin/"
@@ -28,6 +24,18 @@ class MinishiftISOTest(Test):
         self.iso_file = self.repo_dir + "/build/%s.iso" % self.iso_name
         if not os.path.isfile(self.iso_file):
             self.skip("Skipping testing as no ISO found in 'build' directory.")
+
+        self.log.info("################################################################")
+        self.log.info("Avocado version : %s" % VERSION)
+        cmd = self.bin_dir + "minishift version"
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        output, error_message = process.communicate()
+        if error_message:
+            self.log.debug("Error in getting Minishift version: %s" % error_message)
+
+        self.log.info("Minishift version : %s" % output)
+        self.log.info("################################################################")
+
 
     def test_boot_vm_out_of_iso(self):
         ''' Test booting up VM out of ISO '''
@@ -101,7 +109,7 @@ class MinishiftISOTest(Test):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         output = process.communicate()[0]
         self.assertEqual(0, process.returncode)
-        self.assertEqual('Does Not Exist', output.rstrip())
+        self.assertEqual('Currently no Minishift VM defined.', output.rstrip())
 
     # Helper Functions
     def execute_test(self, options):
