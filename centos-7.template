@@ -166,6 +166,8 @@ EOF
 
 systemctl enable docker
 
+rpm -e --nodeps rpm rpm-libs rpm-python rpm-build-libs yum yum-plugin-fastestmirror
+
 rm -rf /usr/lib/locale/locale-archive
 rm -rf /var/cache/yum/*
 
