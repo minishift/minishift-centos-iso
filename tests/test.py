@@ -81,7 +81,8 @@ class MinishiftISOTest(Test):
 
     def test_swapspace(self):
         ''' Test if swap space is available on restart '''
-        cmd = self.bin_dir + "minishift start"
+        start_args = (self.driver_name, "file://"  + self.iso_file)
+        cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
         self.execute_test({ 'cmd': cmd })
 
         # Check swap space

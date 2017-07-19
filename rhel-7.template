@@ -101,7 +101,7 @@ TYPE="Ethernet"
 PERSISTENT_DHCLIENT="yes"
 EOF
 
-# Place holder for base64 encrypt handle-user-data script
+# Place holder for base64 encode handle-user-data script
 cat > handle-user-data.base64 << EOF
 ${handle_user_data}
 EOF
@@ -112,6 +112,7 @@ echo "VARIANT_VERSION=\"${version}\"" >> /etc/os-release
 echo "BUILD_ID=\"${build_id}\"" >> /etc/os-release
 
 base64 -d < handle-user-data.base64 > handle-user-data
+rm handle-user-data.base64
 mv handle-user-data /etc/rc.d/init.d/
 
 chmod +x /etc/rc.d/init.d/handle-user-data
@@ -134,6 +135,7 @@ ${cert_gen}
 EOF
 
 base64 -d < cert-gen.sh.base64 > cert-gen.sh
+rm cert-gen.sh.base64
 chmod +x cert-gen.sh
 mv cert-gen.sh /opt
 
@@ -185,6 +187,17 @@ EOF
 
 systemctl enable docker
 systemctl enable rhel-push-plugin
+
+# Show a warning banner when using yum to install software
+mv /usr/bin/yum /usr/bin/yum-unsupported
+# Place holder for base64 encode yum-wrapper script
+cat > yum-wrapper.base64 << EOF
+${yum_wrapper}
+EOF
+base64 -d < yum-wrapper.base64 > yum-wrapper
+rm yum-wrapper.base64
+mv yum-wrapper /usr/bin/yum
+chmod +x /usr/bin/yum
 
 rm -f /etc/resolv.conf
 rm -rf /usr/lib/locale/locale-archive

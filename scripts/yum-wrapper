@@ -1,0 +1,22 @@
+#!/bin/sh
+function hr() {
+  printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+}
+
+function banner() {
+  hr
+  echo -e "Installing additional packages on the root filesystem might exceed the allocated overlay size and lock the Minishift VM. Proceed with the installation at your own risk."
+  echo -e "For more information, see https://docs.openshift.org/latest/minishift/using/troubleshooting.html#root-filesystem-exceeds-overlay-size"
+  hr
+}
+
+banner
+if echo "$@" | grep -iq " -y" ; then
+  answer="y"
+else
+  echo "Are you sure you want to continue? [y/N]"
+  read answer
+fi
+if echo "$answer" | grep -iq "^y" ; then
+    yum-unsupported $@
+fi
