@@ -44,6 +44,7 @@ syslinux
 hyperv-daemons
 cifs-utils
 fuse-sshfs
+nfs-utils
 
 #Packages to be removed
 -aic94xx-firmware
