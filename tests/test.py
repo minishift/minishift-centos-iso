@@ -81,6 +81,7 @@ class MinishiftISOTest(Test):
 
     def test_swapspace(self):
         ''' Test if swap space is available on restart '''
+        time.sleep(10)
         cmd = self.bin_dir + "minishift start"
         self.execute_test({ 'cmd': cmd })
 
