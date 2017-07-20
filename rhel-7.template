@@ -43,6 +43,7 @@ hyperv-daemons
 cifs-utils
 cdk-entitlements
 fuse-sshfs
+nfs-utils
 
 #Packages to be removed
 -aic94xx-firmware

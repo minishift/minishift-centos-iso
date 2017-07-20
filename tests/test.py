@@ -59,12 +59,17 @@ class MinishiftISOTest(Test):
     def test_cifs_installed(self):
         cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.cifs -V'"
         output = self.execute_test({ 'cmd': cmd })
-        self.assertEqual('mount.cifs version: 6.2', output.rstrip())
+        self.assertEqual(output.rstrip(), 'mount.cifs version: 6.2')
 
     def test_sshfs_installed(self):
         cmd = self.bin_dir + "minishift ssh 'sudo sshfs -V'"
         output = self.execute_test({ 'cmd': cmd })
         self.assertRegexpMatches(output.rstrip(), r'.*SSHFS version 2\.5.*')
+
+    def test_nfs_installed(self):
+        cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.nfs -V'"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output.rstrip(), 'mount.nfs: (linux nfs-utils 1.3.0)')
 
     def test_stopping_vm(self):
         ''' Test stopping machine '''
@@ -81,7 +86,8 @@ class MinishiftISOTest(Test):
 
     def test_swapspace(self):
         ''' Test if swap space is available on restart '''
-        cmd = self.bin_dir + "minishift start"
+        start_args = (self.driver_name, "file://"  + self.iso_file)
+        cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
         self.execute_test({ 'cmd': cmd })
 
         # Check swap space
