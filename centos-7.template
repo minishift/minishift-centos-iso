@@ -96,7 +96,7 @@ echo "VARIANT_VERSION=\"${version}\"" >> /etc/os-release
 echo "BUILD_ID=\"${build_id}\"" >> /etc/os-release
 
 base64 -d < handle-user-data.base64 > handle-user-data
-rm handle-user-data.base64
+rm -f handle-user-data.base64
 mv handle-user-data /etc/rc.d/init.d/
 
 chmod +x /etc/rc.d/init.d/handle-user-data
@@ -118,10 +118,10 @@ cat > cert-gen.sh.base64 << EOF
 ${cert_gen}
 EOF
 
-base64 -d < cert-gen.sh.base64 > cert-gen.sh
-rm cert-gen.sh.base64
-chmod +x cert-gen.sh
-mv cert-gen.sh /opt
+base64 -d < cert-gen.sh.base64 > minishift-cert-gen
+rm -f cert-gen.sh.base64
+chmod +x minishift-cert-gen
+mv minishift-cert-gen /usr/local/bin/
 
 # This unit file will take precedence over unit file which present /usr location
 # and it have daemon running using cert so when restart happen then also docker
@@ -139,7 +139,7 @@ NotifyAccess=all
 Environment=GOTRACEBACK=crash
 Environment=DOCKER_HTTP_HOST_COMPAT=1
 Environment=PATH=/usr/libexec/docker:/usr/bin:/usr/sbin
-ExecStartPre=/opt/cert-gen.sh
+ExecStartPre=/usr/local/bin/minishift-cert-gen
 ExecStart=/usr/bin/dockerd-current -H tcp://0.0.0.0:2376 \
                        -H unix:///var/run/docker.sock \
                        --selinux-enabled \
@@ -176,7 +176,7 @@ cat > yum-wrapper.base64 << EOF
 ${yum_wrapper}
 EOF
 base64 -d < yum-wrapper.base64 > yum-wrapper
-rm yum-wrapper.base64
+rm -f yum-wrapper.base64
 mv yum-wrapper /usr/bin/yum
 chmod +x /usr/bin/yum
 
