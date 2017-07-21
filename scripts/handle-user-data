@@ -23,7 +23,7 @@ mount_partitions() {
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
-    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift
+    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift /opt
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
     if [ ! -d "/var/lib" ]; then
@@ -58,6 +58,9 @@ mount_partitions() {
     rm -rf /mnt/$PARTNAME/tmp || true
     mv /tmp /mnt/$PARTNAME/tmp
     ln -fs /mnt/$PARTNAME/tmp /tmp
+
+    mkdir -p /mnt/$PARTNAME/opt
+    ln -s /mnt/$PARTNAME/opt /opt
 
     # Move userdata to persistent storage
     if [ -e "/userdata.tar" ]; then
