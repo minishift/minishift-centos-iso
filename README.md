@@ -21,6 +21,7 @@ the boot2docker ISO.
 - [Tests](#tests)
 - [CI Setup](#ci-setup)
 - [Further reading](#further-reading)
+- [Community](#community)
 
 <!-- /MarkdownTOC -->
 
@@ -158,3 +159,12 @@ know more about CentOS CI.
 Once you are able to build the ISO, you are most likely interested to modify the
 image itself. To do so you have to get familiar with
 [pykickstart](https://github.com/rhinstaller/pykickstart/blob/master/docs/kickstart-docs.rst).
+
+<a name="community"></a>
+## Community
+
+You can reach the Minishift community by:
+
+- Signing up to our [mailing list](https://lists.minishift.io/admin/lists/minishift.lists.minishift.io)
+
+- Joining the `#minishift` channel on [Freenode IRC](https://freenode.net/)
