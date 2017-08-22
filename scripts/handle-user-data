@@ -30,14 +30,6 @@ mount_partitions() {
         mkdir -p /var/lib
     fi
 
-    if [ -d "/etc/pki/consumer" ]; then
-        rm -fr /etc/pki/consumer /etc/pki/entitlement /etc/pki/product
-        mkdir -p /mnt/$PARTNAME/etc/pki/{consumer,entitlement,product}
-        ln -s /mnt/$PARTNAME/etc/pki/consumer /etc/pki/consumer
-        ln -s /mnt/$PARTNAME/etc/pki/entitlement /etc/pki/entitlement
-        ln -s /mnt/$PARTNAME/etc/pki/product /etc/pki/product
-    fi
-
     mkdir -p /mnt/$PARTNAME/var/lib/docker
     ln -s /mnt/$PARTNAME/var/lib/docker /var/lib/docker
 
