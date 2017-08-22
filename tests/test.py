@@ -87,7 +87,7 @@ class MinishiftISOTest(Test):
     def test_swapspace(self):
         ''' Test if swap space is available on restart '''
         start_args = (self.driver_name, "file://"  + self.iso_file)
-        cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
+        cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s --show-libmachine-logs -v5" % start_args
         self.execute_test({ 'cmd': cmd })
 
         # Check swap space
@@ -95,6 +95,18 @@ class MinishiftISOTest(Test):
         self.log.info("Executing command : %s" % cmd)
         output = self.execute_test({ 'cmd': cmd })
         self.assertNotEqual(0, output)
+
+    def test_dockerjournal(self):
+        ''' Give me more information '''
+        cmd = self.bin_dir + "minishift ssh -- sudo journalctl -u docker --no-pager"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output, "ALWAYS FAIL TO GET RESULTS")
+
+    def test_dockerdropin(self):
+        ''' Give me more information '''
+        cmd = self.bin_dir + "minishift ssh -- cat /etc/systemd/system/docker.service.d/10-machine.conf"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output, "ALWAYS FAIL TO GET RESULTS")
 
     def test_delete_vm(self):
         ''' Test removing machine '''
