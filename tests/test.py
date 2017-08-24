@@ -34,11 +34,17 @@ class MinishiftISOTest(Test):
         start_args = (self.driver_name, "file://"  + self.iso_file)
         cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
         self.execute_test({ 'cmd': cmd })
+    
+    def test_status_after_start(self):
+        cmd = self.bin_dir + "minishift status"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output.rstrip(), 'Running')
 
     def test_ssh_connection_to_vm(self):
         ''' Test SSH connection to the VM '''
-        cmd = self.bin_dir + "minishift ssh exit"
-        self.execute_test({ 'cmd': cmd })
+        cmd = self.bin_dir + "minishift ssh -- echo hello"
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output.rstrip(), 'hello')
 
     def test_ip_of_vm(self):
         ''' Test IP of the VM '''
@@ -57,17 +63,17 @@ class MinishiftISOTest(Test):
         self.check_data_evaluable(output.rstrip())
 
     def test_cifs_installed(self):
-        cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.cifs -V'"
+        cmd = self.bin_dir + "minishift ssh -- sudo /sbin/mount.cifs -V"
         output = self.execute_test({ 'cmd': cmd })
         self.assertEqual(output.rstrip(), 'mount.cifs version: 6.2')
 
     def test_sshfs_installed(self):
-        cmd = self.bin_dir + "minishift ssh 'sudo sshfs -V'"
+        cmd = self.bin_dir + "minishift ssh -- sudo sshfs -V"
         output = self.execute_test({ 'cmd': cmd })
         self.assertRegexpMatches(output.rstrip(), r'.*SSHFS version 2\.5.*')
 
     def test_nfs_installed(self):
-        cmd = self.bin_dir + "minishift ssh 'sudo /sbin/mount.nfs -V'"
+        cmd = self.bin_dir + "minishift ssh -- sudo /sbin/mount.nfs -V"
         output = self.execute_test({ 'cmd': cmd })
         self.assertEqual(output.rstrip(), 'mount.nfs: (linux nfs-utils 1.3.0)')
 
@@ -76,22 +82,19 @@ class MinishiftISOTest(Test):
         cmd = self.bin_dir + "minishift stop"
         self.execute_test({ 'cmd': cmd })
 
-        # Check VM status status
+    def test_status_after_stop(self):
         cmd = self.bin_dir + "minishift status"
-        self.log.info("Executing command : %s" % cmd)
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        output = process.communicate()[0]
-        self.assertEqual(0, process.returncode)
-        self.assertEqual('Stopped', output.rstrip())
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output.rstrip(), 'Stopped')
 
-    def test_swapspace(self):
+    def test_restart(self):
         ''' Test if swap space is available on restart '''
         start_args = (self.driver_name, "file://"  + self.iso_file)
         cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
         self.execute_test({ 'cmd': cmd })
 
-        # Check swap space
-        cmd = self.bin_dir + "minishift ssh \"echo `free | tail -n 1 | awk '{print $2}'`\""
+    def test_swapspace(self):
+        cmd = self.bin_dir + "minishift ssh -- free | tail -n 1 | awk '{print $2}'"
         self.log.info("Executing command : %s" % cmd)
         output = self.execute_test({ 'cmd': cmd })
         self.assertNotEqual(0, output)
@@ -100,14 +103,11 @@ class MinishiftISOTest(Test):
         ''' Test removing machine '''
         cmd = self.bin_dir + "minishift delete"
         self.execute_test({ 'cmd': cmd })
-
-        # Check VM status status
+    
+    def test_status_after_delete(self):
         cmd = self.bin_dir + "minishift status"
-        self.log.info("Executing command : %s" % cmd)
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        output = process.communicate()[0]
-        self.assertEqual(0, process.returncode)
-        self.assertEqual('Does Not Exist', output.rstrip())
+        output = self.execute_test({ 'cmd': cmd })
+        self.assertEqual(output.rstrip(), 'Does Not Exist')
 
     # Helper Functions
     def execute_test(self, options):
