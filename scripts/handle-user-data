@@ -21,9 +21,22 @@ mount_partitions() {
     echo "activate swap ..."
     swapon "${UNPARTITIONED_HD}2"
 
+    mkdir -p /opt
+
+    echo "======== before umount ===========" > /opt/boot.txt
+    echo "ls -la /var/lib ========== \n $(ls -la /var/lib)" >> /opt/boot.txt
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
-    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift /opt
+
+    echo "======== after umount ===========" >> /opt/boot.txt
+    echo "ls -la /var/lib ========== \n $(ls -la /var/lib)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "mount | grep /var/lib ===== \n $(mount | grep /var/lib)" >> /opt/boot.txt
+
+    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift
+
+    echo "======================" >> /opt/boot.txt
+    echo "ls -la /var/lib ====\n $(ls -la /var/lib)" >> /opt/boot.txt
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
     if [ ! -d "/var/lib" ]; then
@@ -53,7 +66,24 @@ mount_partitions() {
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
-    
+
+    echo "======== after mount ===========" >> /opt/boot.txt
+    echo "ls -la /var/lib ====\n $(ls -la /var/lib)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "ls -la /var/lib/docker ====\n $(ls -la /var/lib/docker)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "mount | grep /var/lib ====\n $(mount | grep /var/lib)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "journalctl -u docker-storage-setup ====\n $(journalctl -u docker-storage-setup)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "journalctl -u docker ====\n $(journalctl -u docker)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+    echo "journalctl -u rc-local ====\n $(journalctl -u rc-local)" >> /opt/boot.txt
+    echo "======================" >> /opt/boot.txt
+
+    echo "journalctl logs ===="
+    echo "$(journalctl)" >> /opt/boot.txt
+
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
     mv /tmp /mnt/$PARTNAME/tmp
@@ -70,7 +100,7 @@ mount_partitions() {
     ls -l /mnt/$PARTNAME
 }
 
-# Function to partion and format the data disk
+# Function to partion and formattingrmat the data disk
 prepare_partions() {
     # Create the partition, format it and then mount it
     echo "NEW boot2docker managed disk image ($UNPARTITIONED_HD): formatting it for use"
