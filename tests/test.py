@@ -34,7 +34,7 @@ class MinishiftISOTest(Test):
         start_args = (self.driver_name, "file://"  + self.iso_file)
         cmd = self.bin_dir + "minishift start --vm-driver %s --iso-url %s" % start_args
         self.execute_test({ 'cmd': cmd })
-    
+
     def test_status_after_start(self):
         cmd = self.bin_dir + "minishift status"
         output = self.execute_test({ 'cmd': cmd })
@@ -99,11 +99,17 @@ class MinishiftISOTest(Test):
         output = self.execute_test({ 'cmd': cmd })
         self.assertNotEqual(0, output)
 
+    # def test_dockerjournal(self):
+    #     ''' Give me more information '''
+    #     cmd = self.bin_dir + "minishift ssh -- sudo journalctl -u docker --no-pager"
+    #     output = self.execute_test({ 'cmd': cmd })
+    #     self.assertEqual(output, "ALWAYS FAIL TO GET RESULTS")
+
     def test_delete_vm(self):
         ''' Test removing machine '''
         cmd = self.bin_dir + "minishift delete"
         self.execute_test({ 'cmd': cmd })
-    
+
     def test_status_after_delete(self):
         cmd = self.bin_dir + "minishift status"
         output = self.execute_test({ 'cmd': cmd })
