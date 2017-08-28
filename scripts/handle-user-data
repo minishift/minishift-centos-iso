@@ -53,7 +53,7 @@ mount_partitions() {
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
-    
+
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
     mv /tmp /mnt/$PARTNAME/tmp
@@ -86,7 +86,7 @@ prepare_partions() {
     # wait for the partition to actually exist, timeout after about 5 seconds
     local timer=0
     while [ "$timer" -lt 10 -a ! -b "${UNPARTITIONED_HD}2" ]; do
-    	timer=$((timer + 1))
+        timer=$((timer + 1))
         sleep 0.5
     done
 
@@ -100,7 +100,7 @@ prepare_partions() {
     # wait for the partition to actually exist, timeout after about 5 seconds
     timer=0
     while [ "$timer" -lt 10 -a ! -b "${UNPARTITIONED_HD}1" ]; do
-    	timer=$((timer + 1))
+        timer=$((timer + 1))
         sleep 0.5
     done
 
@@ -110,15 +110,15 @@ prepare_partions() {
 
 # Function to extract userdata.tar containing the ssh keys into the home directory /home/docker
 handle_user_data() {
-	# Extract the userdata into docker user home directory
-	if [ -e "/var/lib/boot2docker/userdata.tar" ]; then
-		tar xf /var/lib/boot2docker/userdata.tar -C /home/docker/ > /var/log/userdata.log 2>&1
-    	rm -f '/home/docker/boot2docker, please format-me'
-		chown -R docker:docker /home/docker/.ssh
-	else
-		echo "Unable to find userdata.tar"
-		exit 1
-	fi
+    # Extract the userdata into docker user home directory
+    if [ -e "/var/lib/boot2docker/userdata.tar" ]; then
+        tar xf /var/lib/boot2docker/userdata.tar -C /home/docker/ > /var/log/userdata.log 2>&1
+        rm -f '/home/docker/boot2docker, please format-me'
+        chown -R docker:docker /home/docker/.ssh
+    else
+        echo "Unable to find userdata.tar"
+        exit 1
+    fi
 }
 
 # TODO Need to make sure to have /sbin on the PATH. Is there a better way?
@@ -131,16 +131,16 @@ echo 'PATH=$PATH:/sbin' >> /home/docker/.bashrc
 # userdata.tar. Remember, /home/docker is not persistent
 BOOT2DOCKER_DATA=`blkid -o device -l -t LABEL=$LABEL`
 if [ -n "$BOOT2DOCKER_DATA" ]; then
-	mount_partitions
-	handle_user_data
-	exit 0
+    mount_partitions
+    handle_user_data
+    exit 0
 fi
 
 # Test for our magic string (it means that the disk was made by ./boot2docker init)
 HEADER=`dd if=$UNPARTITIONED_HD bs=1 count=${#MAGIC} 2>/dev/null`
 if [ "$HEADER" = "$MAGIC" ]; then
-	# Read /userdata.tar with ssh keys and place it temporarily under /
-	dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
+    # Read /userdata.tar with ssh keys and place it temporarily under /
+    dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
 
     prepare_partions
     mount_partitions

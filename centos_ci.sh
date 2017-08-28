@@ -16,25 +16,27 @@ if [ -e "jenkins-env" ]; then
   source ~/.jenkins-env
 fi
 
+# Enable extra packages
+yum --enablerepo=extras install -y epel-release
+
 # Get all the deps in
 yum -y install \
   make \
   git \
-  epel-release \
   livecd-tools \
   curl \
   docker \
   parted \
   kvm \
   qemu-kvm \
-  libvirt
+  libvirt \
+  python2-pip
+
+# Install 'requests' module used by tests/utils/minishift_latest_version.py
+pip install requests
 
 # Start Libvirt
 sudo systemctl start libvirtd
-
-# Install Avocado
-sudo curl https://repos-avocadoproject.rhcloud.com/static/avocado-el.repo -o /etc/yum.repos.d/avocado.repo
-sudo yum install -y avocado
 
 # Setup test drivers
 curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.7.0/docker-machine-driver-kvm > /usr/local/bin/docker-machine-driver-kvm && \
@@ -43,8 +45,8 @@ chmod +x /usr/local/bin/docker-machine-driver-kvm
 # Prepare ISO for testing
 make centos_iso
 
-# Let's test with showing log enabled
-SHOW_LOG=--show-job-log make test
+# Run tests
+make test
 
 # On reaching successfully at this point, upload artifacts
 PASS=$(echo $CICO_API_KEY | cut -d'-' -f1-2)
