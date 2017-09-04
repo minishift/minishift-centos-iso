@@ -1,0 +1,15 @@
+#  This file is part of Minishift
+
+[Unit]
+Description=Minishift IP assignment
+ConditionFileIsExecutable=/usr/local/bin/minishift-set-ipaddress
+After=minishift-handle-user-data.service
+Requires=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/minishift-set-ipaddress
+TimeoutSec=0
+
+[Install]
+WantedBy=multi-user.target

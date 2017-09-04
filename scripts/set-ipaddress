@@ -12,9 +12,15 @@ if [ -e $NETWORK_SCRIPT ]; then
   . $NETWORK_SCRIPT
   
   echo "Set temporary IP: $IPADDR"
-  systemctl stop NetworkManager
+  ip link set dev $DEVICE up
   ip a add $IPADDR/$NETMASK dev $DEVICE
   [ ! -z "$GATEWAY" ] && ip route add default via $GATEWAY dev $DEVICE
   [ ! -z "$DNS1" ] && echo "nameserver $DNS1" >  /etc/resolv.conf
   [ ! -z "$DNS2" ] && echo "nameserver $DNS2" >> /etc/resolv.conf
+else
+
+  systemctl start NetworkManager
+
 fi
+
+exit 0

@@ -145,4 +145,5 @@ if [ "$HEADER" = "$MAGIC" ]; then
     prepare_partions
     mount_partitions
     handle_user_data
+    exit 0
 fi
