@@ -1,9 +1,11 @@
 BUILD_DIR=$(shell pwd)/build
 BIN_DIR=$(BUILD_DIR)/bin
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
+HANDLE_USER_DATA_SERVICE=$(shell base64 -w 0 scripts/handle-user-data.service)
 YUM_WRAPPER=$(shell base64 -w 0 scripts/yum-wrapper)
-CERT_GEN=$(shell base64 -w 0 scripts/cert-gen.sh)
+CERT_GEN=$(shell base64 -w 0 scripts/cert-gen)
 SET_IPADDRESS=$(shell base64 -w 0 scripts/set-ipaddress)
+SET_IPADDRESS_SERVICE=$(shell base64 -w 0 scripts/set-ipaddress.service)
 VERSION=1.2.0
 GITTAG=$(shell git rev-parse --short HEAD)
 TODAY=$(shell date +"%d%m%Y%H%M%S")
@@ -39,7 +41,9 @@ rhel_iso: iso_creation
 
 .PHONY: iso_creation
 iso_creation: init
-	@handle_user_data='$(HANDLE_USER_DATA)' yum_wrapper='$(YUM_WRAPPER)' set_ipaddress='$(SET_IPADDRESS)' cert_gen='$(CERT_GEN)' \
+	@handle_user_data='$(HANDLE_USER_DATA)' handle_user_data_service='$(HANDLE_USER_DATA_SERVICE)' \
+        set_ipaddress='$(SET_IPADDRESS)' set_ipaddress_service='$(SET_IPADDRESS_SERVICE)' \
+        yum_wrapper='$(YUM_WRAPPER)' cert_gen='$(CERT_GEN)' \
 		version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
 		envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)

@@ -12,7 +12,7 @@ rootpw --plaintext centos
 auth --useshadow --passalgo=sha512
 
 timezone --utc America/New_York
-bootloader --location=mbr --append="no_timer_check console=ttyS0 console=tty0 net.ifnames=0 biosdevname=0"
+bootloader --timeout=1 --location=mbr --append="no_timer_check console=ttyS0 console=tty0 net.ifnames=0 biosdevname=0"
 clearpart --all
 part / --fstype="ext4" --size=10240
 
@@ -87,25 +87,10 @@ echo "LANG=\"C\"" > /etc/locale.conf
 echo "%docker ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/docker
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
-# Place holder for base64 encode handle-user-data script
-cat > handle-user-data.base64 << EOF
-${handle_user_data}
-EOF
-
 # minishift as variant for custom provisioner
 echo "VARIANT=\"minishift\"" >> /etc/os-release
 echo "VARIANT_VERSION=\"${version}\"" >> /etc/os-release
 echo "BUILD_ID=\"${build_id}\"" >> /etc/os-release
-
-base64 -d < handle-user-data.base64 > handle-user-data
-rm -f handle-user-data.base64
-mv handle-user-data /etc/rc.d/init.d/
-
-chmod +x /etc/rc.d/init.d/handle-user-data
-/sbin/restorecon /etc/rc.d/init.d/handle-user-data
-
-chmod +x /etc/rc.d/rc.local
-echo "/etc/rc.d/init.d/handle-user-data" >> /etc/rc.d/rc.local
 
 # Remove redhat-logo and firmware package to help with reduce box size
 yum remove -y redhat-logos linux-firmware
@@ -113,15 +98,16 @@ yum remove -y redhat-logos linux-firmware
 # Clear yum package and metadata cache
 yum clean all
 
+
 # Place holder cert generation script. This is needed to create certs when system
 # boots first time to make sure docker daemon running with cert enabled. On restart
 # this script will first check cert is already available or not.
-cat > cert-gen.sh.base64 << EOF
+cat > cert-gen.base64 << EOF
 ${cert_gen}
 EOF
 
-base64 -d < cert-gen.sh.base64 > minishift-cert-gen
-rm -f cert-gen.sh.base64
+base64 -d < cert-gen.base64 > minishift-cert-gen
+rm -f cert-gen.base64
 chmod +x minishift-cert-gen
 mv minishift-cert-gen /usr/local/bin/
 
@@ -169,7 +155,6 @@ Environment=
 WantedBy=multi-user.target
 EOF
 
-systemctl enable docker
 
 # Show a warning banner when using yum to install software
 mv /usr/bin/yum /usr/bin/yum-unsupported
@@ -179,8 +164,27 @@ ${yum_wrapper}
 EOF
 base64 -d < yum-wrapper.base64 > yum-wrapper
 rm -f yum-wrapper.base64
+chmod +x yum-wrapper
 mv yum-wrapper /usr/bin/yum
-chmod +x /usr/bin/yum
+
+
+# Place holder for base64 encode handle-user-data script
+cat > handle-user-data.base64 << EOF
+${handle_user_data}
+EOF
+base64 -d < handle-user-data.base64 > handle-user-data
+rm -f handle-user-data.base64
+chmod +x handle-user-data
+mv handle-user-data /usr/local/bin/minishift-handle-user-data
+
+# Handle user data (systemd service)
+cat > handle-user-data-service.base64 << EOF
+${handle_user_data_service}
+EOF
+base64 -d < handle-user-data-service.base64 > handle-user-data.service
+rm handle-user-data-service.base64
+mv handle-user-data.service /usr/lib/systemd/system/minishift-handle-user-data.service
+
 
 # Set IP address based on settings or hvkvp (Hyper-V)
 cat > set-ipaddress.base64 << EOF
@@ -188,9 +192,27 @@ ${set_ipaddress}
 EOF
 base64 -d < set-ipaddress.base64 > set-ipaddress
 rm set-ipaddress.base64
+chmod +x set-ipaddress
 mv set-ipaddress /usr/local/bin/minishift-set-ipaddress
-chmod +x /usr/local/bin/minishift-set-ipaddress
-echo "/usr/local/bin/minishift-set-ipaddress" >> /etc/rc.d/rc.local
+
+# Set IP address (systemd service)
+cat > set-ipaddress-service.base64 << EOF
+${set_ipaddress_service}
+EOF
+base64 -d < set-ipaddress-service.base64 > set-ipaddress.service
+rm set-ipaddress-service.base64
+mv set-ipaddress.service /usr/lib/systemd/system/minishift-set-ipaddress.service
+
+
+# Systemd configuration
+systemctl disable network
+systemctl disable NetworkManager
+systemctl disable NetworkManager-dispatcher
+systemctl disable NetworkManager-wait-online
+systemctl enable minishift-handle-user-data
+systemctl enable minishift-set-ipaddress
+systemctl enable docker
+
 
 # Clean
 rm -rf /usr/lib/locale/locale-archive

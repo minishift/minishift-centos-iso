@@ -1,0 +1,15 @@
+#  This file is part of Minishift
+
+[Unit]
+Description=Minishift handle user data
+ConditionFileIsExecutable=/usr/local/bin/minishift-handle-user-data
+Before=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/minishift-handle-user-data
+TimeoutSec=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
