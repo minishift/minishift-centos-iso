@@ -39,17 +39,21 @@ mount_partitions() {
     fi
 
     mkdir -p /mnt/$PARTNAME/var/lib/docker
-    ln -s /mnt/$PARTNAME/var/lib/docker /var/lib/docker
+    mkdir -p /var/lib/docker
+    mount --bind /mnt/$PARTNAME/var/lib/docker /var/lib/docker
 
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
-    ln -s /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
+    mkdir -p /var/lib/boot2docker
+    mount --bind /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
 
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
-    ln -s /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
+    mkdir -p /etc/docker
+    mount --bind /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
 
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
-    ln -s /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
-
+    mkdir -p /var/lib/minishift
+    mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
+    
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
     mv /tmp /mnt/$PARTNAME/tmp
