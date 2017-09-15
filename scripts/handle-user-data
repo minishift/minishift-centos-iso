@@ -20,9 +20,14 @@ mount_partitions() {
     # Activate swap partition
     echo "activate swap ..."
     swapon "${UNPARTITIONED_HD}2"
+    mkdir -p /opt
+    echo "===== Before umount ====== \n${free -m}" > /opt/boot.txt
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
+    echo "======== after umount ===========" >> /opt/boot.txt || true
+    echo "${ls -la /var/lib}" >> /opt/boot.txt || true
+    echo "${mount | grep /var/lib}" >> /opt/boot.txt || true
     rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
@@ -53,7 +58,13 @@ mount_partitions() {
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
-    
+
+    echo "======== after mount ===========" >> /var/log/boot.txt || true
+    echo "${ls -la /var/lib}" >> /opt/boot.txt || true
+    echo "${ls -la /var/lib/docker}" >> /opt/boot.txt || true
+    echo "${mount | grep /var/lib}" >> /opt/boot.txt || true
+
+
     # Make sure /tmp is on the disk too
     rm -rf /mnt/$PARTNAME/tmp || true
     mv /tmp /mnt/$PARTNAME/tmp
