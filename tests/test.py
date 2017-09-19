@@ -103,7 +103,7 @@ class MinishiftISOTest(Test):
 
     def test_delete_vm(self):
         ''' Test removing machine '''
-        cmd = self.bin_dir + "minishift delete"
+        cmd = self.bin_dir + "minishift delete --froce"
         self.execute_test({ 'cmd': cmd })
 
         # Check VM status status
