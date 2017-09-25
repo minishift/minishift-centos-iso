@@ -6,7 +6,7 @@ function hr() {
 function banner() {
   hr
   echo -e "Installing additional packages on the root filesystem might exceed the allocated overlay size and lock the Minishift VM. Proceed with the installation at your own risk."
-  echo -e "For more information, see https://docs.openshift.org/latest/minishift/using/troubleshooting.html#root-filesystem-exceeds-overlay-size"
+  echo -e "For more information, see https://docs.openshift.org/latest/minishift/troubleshooting/troubleshooting-misc.html#root-filesystem-exceeds-overlay-size"
   hr
 }
 
