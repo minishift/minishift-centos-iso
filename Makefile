@@ -81,10 +81,9 @@ $(BIN_DIR)/minishift:
 	@echo "Downloading latest minishift binary..."
 	@mkdir -p $(BIN_DIR)
 	@cd $(BIN_DIR) && \
-	curl -LO --progress-bar $(MINISHIFT_LATEST_URL) && \
-	tar xzf $(ARCHIVE_FILE)
+	curl -LO --progress-bar "https://www.dropbox.com/s/8w3sytkitms4ofb/minishift" && chmod +x minishift
 	@echo "Done."
 
 .PHONY: test
 test: $(BIN_DIR)/minishift
-	avocado run $(SHOW_LOG) tests/test.py
+	avocado run $(SHOW_LOG) --external-runner /bin/bash tests/test.sh
