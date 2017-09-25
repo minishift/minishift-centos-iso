@@ -180,6 +180,10 @@ rm -f yum-wrapper.base64
 mv yum-wrapper /usr/bin/yum
 chmod +x /usr/bin/yum
 
+# Allow to run a custom script
+echo "test -f /opt/minishift-startup && /opt/minishift-startup" >> /etc/rc.d/rc.local
+
+
 # Clean
 rm -rf /usr/lib/locale/locale-archive
 rm -rf /var/cache/yum/*
