@@ -48,16 +48,16 @@ function assert_valid_ip() {
 function verify_start_instance() {
   $BINARY start --iso-url $ISO $EXTRA_FLAGS
   exit_with_message "$?" "Error starting Minishift VM"
-  output=`$BINARY status`
-  assert_equal $output "Running"
+  output=`$BINARY status | sed -n 1p`
+  assert_equal "$output" "Minishift:  Running"
   print_success_message "Starting VM"
 }
 
 function verify_stop_instance() {
   $BINARY stop
   exit_with_message "$?" "Error starting Minishift VM"
-  output=`$BINARY status`
-  assert_equal $output "Stopped"
+  output=`$BINARY status | sed -n 1p`
+  assert_equal "$output" "Minishift:  Stopped"
   print_success_message "Stopping VM"
 }
 
