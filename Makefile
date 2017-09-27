@@ -11,6 +11,7 @@ GITTAG=$(shell git rev-parse --short HEAD)
 TODAY=$(shell date +"%d%m%Y%H%M%S")
 MINISHIFT_LATEST_URL=$(shell python tests/utils/minishift_latest_version.py)
 ARCHIVE_FILE=$(shell echo $(MINISHIFT_LATEST_URL) | rev | cut -d/ -f1 | rev)
+MINISHIFT_UNTAR_DIR=$(shell echo $(ARCHIVE_FILE) | sed 's/.tgz//')
 
 ifndef BUILD_ID
     BUILD_ID=local
@@ -83,11 +84,12 @@ release: centos_iso get_gh-release
 	$(BUILD_DIR)/gh-release create minishift/minishift-centos-iso $(VERSION) master v$(VERSION)
 
 $(BIN_DIR)/minishift:
-	@echo "Downloading latest minishift binary..."
+	@echo "Downloading latest minishift binary at $(BIN_DIR)/minishift..."
 	@mkdir -p $(BIN_DIR)
 	@cd $(BIN_DIR) && \
 	curl -LO --progress-bar $(MINISHIFT_LATEST_URL) && \
-	tar xzf $(ARCHIVE_FILE)
+	tar xzf $(ARCHIVE_FILE) && \
+	mv $(MINISHIFT_UNTAR_DIR)/minishift .
 	@echo "Done."
 
 .PHONY: test
