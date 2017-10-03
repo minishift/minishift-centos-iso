@@ -108,9 +108,16 @@ function verify_nfs_installation() {
 }
 
 function verify_bind_mount() {
-  output=`$BINARY ssh 'findmnt | grep "\[/var/lib/" | wc -l'`
+  output=`$BINARY ssh -- 'findmnt | grep "\[/var/lib/" | wc -l'`
   assert_equal $output "4"
   print_success_message "Bind mount check"
+}
+
+function verify_hvkvp_installation() {
+  expected="Error opening pool"
+  output=`$BINARY ssh -- 'hvkvp'`
+  assert_equal "$output" "$expected"
+  print_success_message "HVKVP check"
 }
 
 function verify_delete() {
