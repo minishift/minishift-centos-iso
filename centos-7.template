@@ -205,6 +205,8 @@ mv set-ipaddress.service /usr/lib/systemd/system/minishift-set-ipaddress.service
 
 
 # Systemd configuration
+systemctl disable kdump
+systemctl disable rc-local
 systemctl disable network
 systemctl disable NetworkManager
 systemctl disable NetworkManager-dispatcher
