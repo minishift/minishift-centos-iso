@@ -19,7 +19,7 @@ function exit_with_message() {
 
 function assert_equal() {
   if [ "$1" != "$2" ]; then
-    echo "Expected '$1' equal to '$2'"
+    echo "Expected '$2' but got '$1'"
     exit 1
   fi
 }
@@ -64,7 +64,7 @@ function verify_stop_instance() {
 function verify_swap_space() {
   output=`$BINARY ssh -- echo $(free | tail -n 1 | awk '{print $2}')`
   if [ "$output" == "0" ]; then
-    echo "Expected '$output' not equal to 0"
+    echo "Expected '0' but got '$output'"
     exit 1
   fi
   print_success_message "Swap space check"
@@ -72,7 +72,7 @@ function verify_swap_space() {
 
 function verify_ssh_connection() {
   output=`$BINARY ssh -- echo hello`
-  assert_equal $output "hello"
+  assert_equal "$output" "hello"
   print_success_message "SSH Connection"
 }
 
