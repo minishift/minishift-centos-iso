@@ -123,12 +123,6 @@ function verify_hvkvp_installation() {
 function verify_delete() {
   $BINARY delete --force
   exit_with_message "$?" "Error deleting Minishift VM"
-  output=`$BINARY status`
-  if [ "$1" != "$2" ]; then
-    echo "Expected '$1' equal to '$2'"
-    exit 1
-  fi
-  print_success_message "Deleting VM"
 }
 
 # Tests
