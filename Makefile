@@ -27,31 +27,28 @@ init:
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: rhel
-KICKSTART_FILE=rhel-7.ks
-KICKSTART_TEMPLATE=rhel-7.template
-ISO_NAME=minishift-rhel7
 
-.PHONY: centos
-KICKSTART_FILE=centos-7.ks
-KICKSTART_TEMPLATE=centos-7.template
-ISO_NAME=minishift-centos7
 
 .PHONY: centos_iso
-centos_iso: centos
+centos_iso: ISO_NAME=minishift-centos7
+centos_iso: KICKSTART_FILE=centos-7.ks
+centos_iso: centos_kickstart
 centos_iso: iso_creation
 
 .PHONY: rhel_iso
-rhel_iso: rhel
-rhel_iso: check_env
+rhel_iso: ISO_NAME=minishift-rhel7
+rhel_iso: KICKSTART_FILE=rhel-7.ks
+rhel_iso: rhel_kickstart
 rhel_iso: iso_creation
 
 .PHONY: centos_kickstart
-centos_kickstart: centos
+centos_kickstart: KICKSTART_FILE=centos-7.ks
+centos_kickstart: KICKSTART_TEMPLATE=centos-7.template
 centos_kickstart: kickstart
 
 .PHONY: rhel_kickstart
-rhel_kickstart: rhel
+rhel_kickstart: KICKSTART_FILE=rhel-7.ks
+rhel_kickstart: KICKSTART_TEMPLATE=rhel-7.template
 rhel_kickstart: check_env
 rhel_kickstart: kickstart
 
@@ -64,7 +61,7 @@ kickstart: init
 		envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 
 .PHONY: iso_creation
-iso_creation: kickstart
+iso_creation:
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
 	# http://askubuntu.com/questions/153833/why-cant-i-mount-the-ubuntu-12-04-installer-isos-in-mac-os-x
 	# http://www.syslinux.org/wiki/index.php?title=Doc/isolinux#HYBRID_CD-ROM.2FHARD_DISK_MODE
