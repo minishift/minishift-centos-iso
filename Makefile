@@ -27,26 +27,44 @@ init:
 clean:
 	rm -rf $(BUILD_DIR)
 
+.PHONY: rhel
+KICKSTART_FILE=rhel-7.ks
+KICKSTART_TEMPLATE=rhel-7.template
+ISO_NAME=minishift-rhel7
+
+.PHONY: centos
+KICKSTART_FILE=centos-7.ks
+KICKSTART_TEMPLATE=centos-7.template
+ISO_NAME=minishift-centos7
+
 .PHONY: centos_iso
-centos_iso: KICKSTART_FILE=centos-7.ks
-centos_iso: KICKSTART_TEMPLATE=centos-7.template
-centos_iso: ISO_NAME=minishift-centos7
+centos_iso: centos
 centos_iso: iso_creation
 
 .PHONY: rhel_iso
-rhel_iso: KICKSTART_FILE=rhel-7.ks
-rhel_iso: KICKSTART_TEMPLATE=rhel-7.template
-rhel_iso: ISO_NAME=minishift-rhel7
+rhel_iso: rhel
 rhel_iso: check_env
 rhel_iso: iso_creation
 
-.PHONY: iso_creation
-iso_creation: init
+.PHONY: centos_kickstart
+centos_kickstart: centos
+centos_kickstart: kickstart
+
+.PHONY: rhel_kickstart
+rhel_kickstart: rhel
+rhel_kickstart: check_env
+rhel_kickstart: kickstart
+
+.PHONY: kickstart
+kickstart: init
 	@handle_user_data='$(HANDLE_USER_DATA)' handle_user_data_service='$(HANDLE_USER_DATA_SERVICE)' \
         set_ipaddress='$(SET_IPADDRESS)' set_ipaddress_service='$(SET_IPADDRESS_SERVICE)' \
         yum_wrapper='$(YUM_WRAPPER)' cert_gen='$(CERT_GEN)' \
 		version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
 		envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
+
+.PHONY: iso_creation
+iso_creation: kickstart
 	cd $(BUILD_DIR); sudo livecd-creator --config $(BUILD_DIR)/$(KICKSTART_FILE) --logfile=$(BUILD_DIR)/livecd-creator.log --fslabel $(ISO_NAME)
 	# http://askubuntu.com/questions/153833/why-cant-i-mount-the-ubuntu-12-04-installer-isos-in-mac-os-x
 	# http://www.syslinux.org/wiki/index.php?title=Doc/isolinux#HYBRID_CD-ROM.2FHARD_DISK_MODE
