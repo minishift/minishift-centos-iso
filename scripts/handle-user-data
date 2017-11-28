@@ -121,6 +121,20 @@ handle_user_data() {
     fi
 }
 
+# This function can be used to write an initial configuration that can be used on first time start
+firsttime_config() {
+	# Force dynamic IP address assignment
+	mkdir -p /var/lib/minishift/
+	cat > /var/lib/minishift/networking-eth0 << EOF
+DEVICE=eth0
+USEDHCP=y
+EOF
+	cat > /var/lib/minishift/networking-eth1 << EOF
+DEVICE=eth1
+USEDHCP=y
+EOF
+}
+
 # TODO Need to make sure to have /sbin on the PATH. Is there a better way?
 # http://stackoverflow.com/questions/19983710/some-commands-not-wroking-on-remote-servers-through-ssh-shell
 # https://github.com/LalatenduMohanty/centos-live-iso/issues/11
@@ -145,5 +159,6 @@ if [ "$HEADER" = "$MAGIC" ]; then
     prepare_partions
     mount_partitions
     handle_user_data
+    firsttime_config
     exit 0
 fi

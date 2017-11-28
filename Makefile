@@ -7,6 +7,7 @@ CERT_GEN=$(shell base64 -w 0 scripts/cert-gen)
 SET_IPADDRESS=$(shell base64 -w 0 scripts/set-ipaddress)
 SET_IPADDRESS_SERVICE=$(shell base64 -w 0 scripts/set-ipaddress.service)
 VERSION=1.4.0
+DHCLIENT_SCRIPT=$(shell base64 -w 0 scripts/dhclient-script)
 GITTAG=$(shell git rev-parse --short HEAD)
 TODAY=$(shell date +"%d%m%Y%H%M%S")
 MINISHIFT_LATEST_URL=$(shell python tests/utils/minishift_latest_version.py)
@@ -55,10 +56,10 @@ rhel_kickstart: kickstart
 .PHONY: kickstart
 kickstart: init
 	@handle_user_data='$(HANDLE_USER_DATA)' handle_user_data_service='$(HANDLE_USER_DATA_SERVICE)' \
-        set_ipaddress='$(SET_IPADDRESS)' set_ipaddress_service='$(SET_IPADDRESS_SERVICE)' \
-        yum_wrapper='$(YUM_WRAPPER)' cert_gen='$(CERT_GEN)' \
-		version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
-		envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
+	set_ipaddress='$(SET_IPADDRESS)' set_ipaddress_service='$(SET_IPADDRESS_SERVICE)' \
+	yum_wrapper='$(YUM_WRAPPER)' cert_gen='$(CERT_GEN)'  dhclient_script='$(DHCLIENT_SCRIPT)' \
+	version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \
+	envsubst < $(KICKSTART_TEMPLATE) > $(BUILD_DIR)/$(KICKSTART_FILE)
 
 .PHONY: iso_creation
 iso_creation:
