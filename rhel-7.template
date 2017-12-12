@@ -44,6 +44,7 @@ cifs-utils
 cdk-entitlements
 fuse-sshfs
 nfs-utils
+go-hvkvp
 python-setuptools
 
 #Packages to be removed
@@ -85,23 +86,6 @@ echo "LANG=\"C\"" > /etc/locale.conf
 echo "%docker ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/docker
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
-# Network configuration to make sure eth0 works to connect with outer world
-cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
-DEVICE="eth0"
-BOOTPROTO="dhcp"
-ONBOOT="yes"
-TYPE="Ethernet"
-PERSISTENT_DHCLIENT="yes"
-EOF
-
-# Network configuration to make sure eth1 works for machine
-cat > /etc/sysconfig/network-scripts/ifcfg-eth1 << EOF
-DEVICE="eth1"
-BOOTPROTO="dhcp"
-ONBOOT="yes"
-TYPE="Ethernet"
-PERSISTENT_DHCLIENT="yes"
-EOF
 
 # Place holder for base64 encode handle-user-data script
 cat > handle-user-data.base64 << EOF
@@ -149,9 +133,6 @@ sed -i.back '/After=*/c\After=cloud-init.service rc-local.service' /usr/lib/syst
 # update the docker config to listen on TCP as well as unix socket
 sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled --log-driver=journald -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
 
-systemctl enable docker
-systemctl enable rhel-push-plugin
-
 # Show a warning banner when using yum to install software
 mv /usr/bin/yum /usr/bin/yum-unsupported
 # Place holder for base64 encode yum-wrapper script
@@ -163,7 +144,67 @@ rm -f yum-wrapper.base64
 mv yum-wrapper /usr/bin/yum
 chmod +x /usr/bin/yum
 
+
+# Place holder for base64 encode handle-user-data script
+cat > handle-user-data.base64 << EOF
+${handle_user_data}
+EOF
+base64 -d < handle-user-data.base64 > handle-user-data
+rm -f handle-user-data.base64
+chmod +x handle-user-data
+mv handle-user-data /usr/local/bin/minishift-handle-user-data
+
+# Handle user data (systemd service)
+cat > handle-user-data-service.base64 << EOF
+${handle_user_data_service}
+EOF
+base64 -d < handle-user-data-service.base64 > handle-user-data.service
+rm handle-user-data-service.base64
+mv handle-user-data.service /usr/lib/systemd/system/minishift-handle-user-data.service
+
+
+# Set IP address based on settings or hvkvp (Hyper-V)
+cat > set-ipaddress.base64 << EOF
+${set_ipaddress}
+EOF
+base64 -d < set-ipaddress.base64 > set-ipaddress
+rm set-ipaddress.base64
+chmod +x set-ipaddress
+mv set-ipaddress /usr/local/bin/minishift-set-ipaddress
+
+# Set IP address (systemd service)
+cat > set-ipaddress-service.base64 << EOF
+${set_ipaddress_service}
+EOF
+base64 -d < set-ipaddress-service.base64 > set-ipaddress.service
+rm set-ipaddress-service.base64
+mv set-ipaddress.service /usr/lib/systemd/system/minishift-set-ipaddress.service
+
+# Override dhclient script
+cat > dhclient-script.base64 << EOF
+${dhclient_script}
+EOF
+base64 -d < dhclient-script.base64 > dhclient-script
+rm dhclient-script.base64
+chmod +x dhclient-script
+mv dhclient-script /usr/sbin/dhclient-script
+
+
+# Systemd configuration
+systemctl disable kdump
+systemctl disable rc-local
+systemctl disable network
+systemctl disable NetworkManager
+systemctl disable NetworkManager-dispatcher
+systemctl disable NetworkManager-wait-online
+systemctl enable minishift-handle-user-data
+systemctl enable minishift-set-ipaddress
+systemctl enable docker
+systemctl enable rhel-push-plugin
+
+# Clean
 rm -f /etc/resolv.conf
 rm -rf /usr/lib/locale/locale-archive
 rm -rf /var/cache/yum/*
+
 %end
