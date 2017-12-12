@@ -120,7 +120,7 @@ make release
 <a name="tests"></a>
 ## Tests
 
-Tests are written as Python scripts under `tests` directory and run through [Avocado](avocado-framework.readthedocs.io) framework. Ensure you have _Avocado_ installed by following [Avocado instllation guide](http://avocado-framework.readthedocs.io/en/44.0/GetStartedGuide.html#installing-avocado) before running any tests.
+Tests are written as a shell script in `tests/test.sh`. 
 
 Build ISO:
 ```
