@@ -47,6 +47,7 @@ cifs-utils
 fuse-sshfs
 nfs-utils
 go-hvkvp
+python-setuptools
 
 #Packages to be removed
 -aic94xx-firmware

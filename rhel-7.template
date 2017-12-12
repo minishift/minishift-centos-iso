@@ -44,6 +44,7 @@ cifs-utils
 cdk-entitlements
 fuse-sshfs
 nfs-utils
+python-setuptools
 
 #Packages to be removed
 -aic94xx-firmware
