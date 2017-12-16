@@ -22,6 +22,7 @@ repo --name=updates --baseurl=http://mirror.centos.org/centos/7/updates/x86_64/
 repo --name=extras --baseurl=http://mirror.centos.org/centos/7/extras/x86_64/
 repo --name=atomic --baseurl=http://mirror.centos.org/centos/7/atomic/x86_64/adb/
 repo --name=hvkvp --baseurl=http://files.gbraad.nl/hvkvp/
+repo --name=virtsig --baseurl=https://cbs.centos.org/repos/virt7-docker-common-candidate/x86_64/os/
 
 shutdown
 
@@ -30,7 +31,7 @@ shutdown
 openssl
 bash
 centos-logos
-docker
+#docker
 dracut
 e4fsprogs
 efibootmgr
@@ -48,6 +49,7 @@ fuse-sshfs
 nfs-utils
 go-hvkvp
 python-setuptools
+cri-o
 
 #Packages to be removed
 -aic94xx-firmware
@@ -103,22 +105,22 @@ yum clean all
 # Place holder cert generation script. This is needed to create certs when system
 # boots first time to make sure docker daemon running with cert enabled. On restart
 # this script will first check cert is already available or not.
-cat > cert-gen.base64 << EOF
-${cert_gen}
-EOF
-
-base64 -d < cert-gen.base64 > minishift-cert-gen
-rm -f cert-gen.base64
-chmod +x minishift-cert-gen
-mv minishift-cert-gen /usr/local/bin/
+#cat > cert-gen.base64 << EOF
+#${cert_gen}
+#EOF
+#
+#base64 -d < cert-gen.base64 > minishift-cert-gen
+#rm -f cert-gen.base64
+#chmod +x minishift-cert-gen
+#mv minishift-cert-gen /usr/local/bin/
 
 # update docker.service file to exec the certificate generation script
-sed -i.back 's/ExecStart=/ExecStartPre=\/usr\/local\/bin\/minishift-cert-gen\n&/' /usr/lib/systemd/system/docker.service
-sed -i.back '/After=*/c\After=network.target rc-local.service' /usr/lib/systemd/system/docker.service
-sed -i.back '/After=*/c\After=cloud-init.service rc-local.service' /usr/lib/systemd/system/docker-storage-setup.service
+#sed -i.back 's/ExecStart=/ExecStartPre=\/usr\/local\/bin\/minishift-cert-gen\n&/' /usr/lib/systemd/system/docker.service
+#sed -i.back '/After=*/c\After=network.target rc-local.service' /usr/lib/systemd/system/docker.service
+#sed -i.back '/After=*/c\After=cloud-init.service rc-local.service' /usr/lib/systemd/system/docker-storage-setup.service
 
 # update the docker config to listen on TCP as well as unix socket
-sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled --log-driver=journald -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
+#sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled --log-driver=journald -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
 
 # Show a warning banner when using yum to install software
 mv /usr/bin/yum /usr/bin/yum-unsupported
@@ -175,10 +177,10 @@ systemctl disable network
 systemctl disable NetworkManager
 systemctl disable NetworkManager-dispatcher
 systemctl disable NetworkManager-wait-online
+systemctl disable docker
 systemctl enable minishift-handle-user-data
 systemctl enable minishift-set-ipaddress
-systemctl enable docker
-
+systemctl enable crio
 
 # Clean
 rm -rf /usr/lib/locale/locale-archive
