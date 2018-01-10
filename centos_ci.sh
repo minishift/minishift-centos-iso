@@ -10,7 +10,7 @@ set -e
 # that might interest this worker.
 if [ -e "jenkins-env" ]; then
   cat jenkins-env \
-    | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprbSourceBranch|ghprbActualCommit|BUILD_URL|ghprbPullId|CICO_API_KEY)=" \
+    | grep -E "(JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprbSourceBranch|ghprbActualCommit|BUILD_URL|ghprbPullId|CICO_API_KEY|GITHUB_TOKEN)=" \
     | sed 's/^/export /g' \
     > ~/.jenkins-env
   source ~/.jenkins-env
@@ -53,6 +53,8 @@ PASS=$(echo $CICO_API_KEY | cut -d'-' -f1-2)
 
 rm -rf build/bin # Don't upload bin folder
 set +x
+# Export GITHUB_ACCESS_TOKEN to prevent Github rate limit
+export GITHUB_ACCESS_TOKEN=$GITHUB_TOKEN
 # For PR build, GIT_BRANCH is set to branch name other than origin/master
 if [[ "$GIT_BRANCH" = "origin/master" ]]; then
   # http://stackoverflow.com/a/22908437/1120530; Using --relative as --rsync-path not working
