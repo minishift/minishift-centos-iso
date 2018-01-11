@@ -54,11 +54,6 @@ mount_partitions() {
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
 
-    # Make sure /tmp is on the disk too
-    rm -rf /mnt/$PARTNAME/tmp || true
-    mv /tmp /mnt/$PARTNAME/tmp
-    ln -fs /mnt/$PARTNAME/tmp /tmp
-
     mkdir -p /mnt/$PARTNAME/opt
     ln -s /mnt/$PARTNAME/opt /opt
 
