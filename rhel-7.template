@@ -97,16 +97,6 @@ echo "VARIANT=\"minishift\"" >> /etc/os-release
 echo "VARIANT_VERSION=\"${version}\"" >> /etc/os-release
 echo "BUILD_ID=\"${build_id}\"" >> /etc/os-release
 
-base64 -d < handle-user-data.base64 > handle-user-data
-rm -f handle-user-data.base64
-mv handle-user-data /etc/rc.d/init.d/
-
-chmod +x /etc/rc.d/init.d/handle-user-data
-/sbin/restorecon /etc/rc.d/init.d/handle-user-data
-
-chmod +x /etc/rc.d/rc.local
-echo "/etc/rc.d/init.d/handle-user-data" >> /etc/rc.d/rc.local
-
 # Remove redhat-logo and firmware package to help with reduce box size
 yum remove -y redhat-logos linux-firmware
 
