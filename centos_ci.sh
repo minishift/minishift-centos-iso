@@ -30,10 +30,7 @@ yum -y install \
   kvm \
   qemu-kvm \
   libvirt \
-  python2-pip
-
-# Install 'requests' module used by tests/utils/minishift_latest_version.py
-pip install requests
+  python-requests
 
 # Start Libvirt
 sudo systemctl start libvirtd
