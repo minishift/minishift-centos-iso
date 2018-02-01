@@ -120,6 +120,9 @@ sed -i.back '/After=*/c\After=cloud-init.service rc-local.service' /usr/lib/syst
 # update the docker config to listen on TCP as well as unix socket
 sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled --log-driver=journald -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
 
+# update docker-storage to use overlay2 as default storage driver
+echo 'DOCKER_STORAGE_OPTIONS="--storage-driver overlay2"' > /etc/sysconfig/docker-storage
+
 # Show a warning banner when using yum to install software
 mv /usr/bin/yum /usr/bin/yum-unsupported
 # Place holder for base64 encode yum-wrapper script

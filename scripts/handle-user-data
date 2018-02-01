@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LABEL=boot2docker-data
+LABEL=b2d-data
 MAGIC="boot2docker, please format-me"
 UNPARTITIONED_HD=/dev/sda
 
@@ -100,7 +100,7 @@ prepare_partions() {
     done
 
     BOOT2DOCKER_DATA=`echo "${UNPARTITIONED_HD}1"`
-    mkfs.ext4 -i 8192 -L $LABEL $BOOT2DOCKER_DATA
+    mkfs.xfs -n ftype=1 -i size=2048 -L $LABEL $BOOT2DOCKER_DATA
 }
 
 # Function to extract userdata.tar containing the ssh keys into the home directory /home/docker
