@@ -62,9 +62,9 @@ function verify_stop_instance() {
 }
 
 function verify_swap_space() {
-  output=`$BINARY ssh -- echo $(free | tail -n 1 | awk '{print $2}')`
+  output=`$BINARY ssh -- free | tail -n 1 | awk '{print $2}'`
   if [ "$output" == "0" ]; then
-    echo "Expected '0' but got '$output'"
+    echo "Expected non zero but got '$output'"
     exit 1
   fi
   print_success_message "Swap space check"
@@ -120,6 +120,13 @@ function verify_hvkvp_installation() {
   print_success_message "HVKVP check"
 }
 
+function verify_xfs_mount() {
+  expected="ftype=1"
+  output=`$BINARY ssh -- xfs_info /mnt/sda1 | grep ftype | awk '{print $6}'`
+  assert_equal "$output" "$expected"
+  print_success_message "xfs mount successful"
+}
+
 function verify_delete() {
   $BINARY delete --force
   exit_with_message "$?" "Error deleting Minishift VM"
@@ -136,4 +143,6 @@ verify_cifs_installation
 verify_sshfs_installation
 verify_nfs_installation
 verify_bind_mount
+verify_xfs_mount
 verify_delete
+
