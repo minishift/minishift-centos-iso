@@ -39,6 +39,9 @@ sudo systemctl start libvirtd
 curl -L https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.7.0/docker-machine-driver-kvm > /usr/local/bin/docker-machine-driver-kvm && \
 chmod +x /usr/local/bin/docker-machine-driver-kvm
 
+# Fail fast to get build slave
+exit 1
+
 # Prepare ISO for testing
 make centos_iso
 
