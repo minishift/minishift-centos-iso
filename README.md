@@ -1,5 +1,5 @@
 <a name="creating-a-minishift-centos-iso"></a>
-# Minishift CentOS VM
+# Minishift CentOS ISO
 
 This repository contains all the instructions and code to build a Live ISO based on CentOS
 which can be used by [minishift](https://github.com/minishift/minishift) as an alternative to
