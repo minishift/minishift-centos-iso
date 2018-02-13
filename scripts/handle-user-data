@@ -41,6 +41,7 @@ mount_partitions() {
     mkdir -p /mnt/$PARTNAME/var/lib/docker
     mkdir -p /var/lib/docker
     mount --bind /mnt/$PARTNAME/var/lib/docker /var/lib/docker
+    restorecon -R /var/lib/docker
 
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
     mkdir -p /var/lib/boot2docker
