@@ -17,7 +17,9 @@ the boot2docker ISO.
 		- [Prerequisites](#prerequisites-1)
 		- [Building the ISO](#building-the-iso-1)
 - [Building the RHEL ISO](#building-the-rhel-iso)
-- [Releasing Minishift ISO](#releasing-minishift-iso)
+- [Releasing Minishift CentOS ISO](#releasing-minishift-centos-iso)
+  - [Manual release](#manual-release)
+  - [Automated release](#automated-release)
 - [Tests](#tests)
 - [CI Setup](#ci-setup)
 - [Further reading](#further-reading)
@@ -104,18 +106,43 @@ $ export cdk_repo_url="<repo_url_to_cdk-entitlement_package>"
 $ make rhel_iso
 ```
 
-<a name="releasing-minishift-iso"></a>
-## Releasing Minishift ISO
+<a name="releasing-minishift-centos-iso"></a>
+## Releasing Minishift CentOS ISO
+
+The following sections describe how to release Minishift CentOS ISO either via automated job or manually.
+
+<a name="manual-release"></a>
+### Manual release
+
+The manual release includes following steps:
 
 - Assemble all the meaningful changes since the last release to create release notes.
 - Bump the `VERSION` variable in the Makefile.
 - Before you execute below command be sure to have a [Github personal access token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) defined in your environment as `GITHUB_ACCESS_TOKEN`.
+- Run following command to perform release:
 
-Run:
+  ```shell
+  $ make release
+  ```
+
+<a name="automated-release"></a>
+### Automated release
+
+An automated release can be performed by triggering CI job as:
 
 ```shell
-make release
+$ make ci_release API_KEY=<api-key> RELEASE_VERSION=<version>
 ```
+
+where
+
+  - `api-key` : Minishift CentOS CI API key
+  - `version` : The expected release version (without 'v'). For example, 1.0.0.
+
+Once triggered you can follow the release process [here](https://ci.centos.org/job/minishift-centos-iso-release/).
+
+The automated release performs all the necessary steps as mentioned in [Manual release](#manual-release).
+
 
 <a name="tests"></a>
 ## Tests
