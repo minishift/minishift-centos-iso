@@ -17,6 +17,19 @@ ifndef BUILD_ID
     BUILD_ID=local
 endif
 
+# Check that given variables are set and all have non-empty values,
+# die with an error otherwise.
+#
+# Params:
+#   1. Variable name(s) to test.
+#   2. (optional) Error message to print.
+check_defined = \
+    $(strip $(foreach 1,$1, \
+        $(call __check_defined,$1,$(strip $(value 2)))))
+__check_defined = \
+    $(if $(value $1),, \
+      $(error Undefined $1$(if $2, ($2))))
+
 default: centos_iso
 
 .PHONY: init
@@ -71,19 +84,10 @@ iso_creation:
 
 .PHONY: check_env
 check_env:
-	@if test "$(rhel_tree_url)" = ""; then \
-		echo "rhel_tree_url is undefined, Please check README"; \
-		exit 1; \
-	elif test "$(base_repo_url)" = ""; then \
-		echo "base_repo_url is undefined, Please check README"; \
-		exit 1; \
-	elif test "$(updates_repo_url)" = ""; then \
-		echo "updates_repo_url is undefined, Please check README"; \
-		exit 1; \
-	elif test "$(cdk_repo_url)" = ""; then \
-		echo "cdk_repo_url is undefined, Please check README"; \
-		exit 1; \
-	fi
+	$(call check_defined, rhel_tree_url, "rhel_tree_url is undefined. Please check README.")
+	$(call check_defined, base_repo_url, "base_repo_url is undefined. Please check README.")
+	$(call check_defined, updates_repo_url, "updates_repo_url is undefined. Please check README.")
+	$(call check_defined, cdk_repo_url, "cdk_repo_url is undefined. Please check README.")
 
 .PHONY: get_gh-release
 get_gh-release: init
@@ -110,3 +114,12 @@ $(BIN_DIR)/minishift:
 .PHONY: test
 test: $(BIN_DIR)/minishift
 	sh tests/test.sh
+
+.PHONY: ci_release
+ci_release:
+	$(call check_defined, API_KEY, "To trigger the CentOS CI release build you need to specify the CentOS CI API key.")
+	$(call check_defined, RELEASE_VERSION, "You need to specify the version you want to release.")
+
+	curl -s -H "$(shell curl -s --user 'minishift:$(API_KEY)' 'https://ci.centos.org//crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')" \
+	-X POST https://ci.centos.org/job/minishift-centos-iso-release/build --user 'minishift:$(API_KEY)' \
+	--data-urlencode json='{"parameter": [{"name":"RELEASE_VERSION", "value":'"$(RELEASE_VERSION)"'}]}'
