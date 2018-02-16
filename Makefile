@@ -110,3 +110,32 @@ $(BIN_DIR)/minishift:
 .PHONY: test
 test: $(BIN_DIR)/minishift
 	sh tests/test.sh
+
+
+
+
+# INTEGRATION TESTS
+REPOPATH ?= github.com/minishift/minishift-centos-iso
+TEST_DIR ?= $(CURDIR)/testing
+INTEGRATION_TEST_DIR = $(TEST_DIR)/integration-test
+
+# Platfrom dependency
+ifeq ($(GOOS),windows)
+	IS_EXE := .exe
+endif
+
+# Integration tests
+TIMEOUT ?= 3600s
+MINISHIFT_BINARY ?= $(TEST_DIR)/bin/minishift$(IS_EXE)
+
+# Make target definitions
+.PHONY: integration
+integration:
+	mkdir -p $(INTEGRATION_TEST_DIR)
+	MINISHIFT_ISO_URL=file://$(TEST_DIR)/iso/minishift-centos7.iso go test -timeout $(TIMEOUT) $(REPOPATH)/tests/integration --tags=integration -v -args --test-dir $(INTEGRATION_TEST_DIR) --binary $(MINISHIFT_BINARY) \
+	--run-before-feature="$(RUN_BEFORE_FEATURE)" --test-with-specified-shell="$(TEST_WITH_SPECIFIED_SHELL)" --tags=$(ADDON) $(GODOG_OPTS)
+
+.PHONY: vendor
+vendor:
+	dep ensure -v
+
