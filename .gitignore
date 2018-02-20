@@ -3,3 +3,5 @@ build
 *.ks
 *.iso
 tests/*.pyc
+testing
+vendor
