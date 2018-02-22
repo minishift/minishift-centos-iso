@@ -110,3 +110,9 @@ $(BIN_DIR)/minishift:
 .PHONY: test
 test: $(BIN_DIR)/minishift
 	sh tests/test.sh
+
+.PHONY: integration
+integration:
+	make --directory $(CURDIR)/../minishift clean
+	make --directory $(CURDIR)/../minishift vendor
+	MINISHIFT_ISO_URL=file://$(CURDIR)/testing/iso/minishift-centos7.iso make --directory $(CURDIR)/../minishift integration GODOG_OPTS="--paths=$(CURDIR)/testing/features --tags=centos-iso"
