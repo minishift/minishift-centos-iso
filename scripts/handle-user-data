@@ -2,7 +2,7 @@
 
 LABEL=b2d-data
 MAGIC="boot2docker, please format-me"
-UNPARTITIONED_HD=/dev/sda
+UNPARTITIONED_HD="/dev/$(lsblk | grep disk | cut -f1 -d' ')"
 
 # Function to mount partitions
 mount_partitions() {
@@ -136,7 +136,7 @@ fi
 HEADER=`dd if=$UNPARTITIONED_HD bs=1 count=${#MAGIC} 2>/dev/null`
 if [ "$HEADER" = "$MAGIC" ]; then
     # Read /userdata.tar with ssh keys and place it temporarily under /
-    dd if=/dev/sda of=/userdata.tar bs=1 count=4096 2>/dev/null
+    dd if=$UNPARTITIONED_HD of=/userdata.tar bs=1 count=4096 2>/dev/null
 
     prepare_partions
     mount_partitions
