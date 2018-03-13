@@ -75,6 +75,10 @@ python-setuptools
 
 %post
 
+# Disable floppy driver to load
+echo "omit_drivers+=\"floppy\"" > /etc/dracut.conf.d/nofloppy.conf
+echo "blacklist floppy" > /etc/modprobe.d/nofloppy.conf
+
 # Setting a global Locale for the server
 echo "LANG=\"C\"" > /etc/locale.conf
 
