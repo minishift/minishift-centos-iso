@@ -2,7 +2,7 @@
 
 LABEL=b2d-data
 MAGIC="boot2docker, please format-me"
-UNPARTITIONED_HD="/dev/$(lsblk | grep disk | cut -f1 -d' ')"
+UNPARTITIONED_HD=/dev/sda
 
 # Function to mount partitions
 mount_partitions() {
@@ -23,7 +23,7 @@ mount_partitions() {
 
     # Just in case, the links will fail if not
     umount -f /var/lib/docker || true
-    rm -rf /var/lib/docker /var/lib/boot2docker /etc/docker /var/lib/minishift /opt
+    rm -rf /var/lib/docker /var/lib/boot2docker /var/lib/minishift /opt
 
     # Detected a disk with a normal linux install (/var/lib/docker + more))
     if [ ! -d "/var/lib" ]; then
@@ -46,10 +46,6 @@ mount_partitions() {
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
     mkdir -p /var/lib/boot2docker
     mount --bind /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
-
-    mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
-    mkdir -p /etc/docker
-    mount --bind /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
 
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
