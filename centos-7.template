@@ -48,6 +48,7 @@ fuse-sshfs
 nfs-utils
 go-hvkvp
 python-setuptools
+dnsmasq
 
 #Packages to be removed
 -aic94xx-firmware
@@ -182,6 +183,7 @@ systemctl disable network
 systemctl disable NetworkManager
 systemctl disable NetworkManager-dispatcher
 systemctl disable NetworkManager-wait-online
+systemctl disable dnsmasq
 systemctl enable minishift-handle-user-data
 systemctl enable minishift-set-ipaddress
 systemctl enable docker
