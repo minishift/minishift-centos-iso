@@ -47,6 +47,7 @@ nfs-utils
 go-hvkvp
 python-setuptools
 dnsmasq
+python-rhsm-certificates
 
 #Packages to be removed
 -aic94xx-firmware
