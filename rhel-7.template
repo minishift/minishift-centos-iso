@@ -179,15 +179,6 @@ base64 -d < set-ipaddress-service.base64 > set-ipaddress.service
 rm set-ipaddress-service.base64
 mv set-ipaddress.service /usr/lib/systemd/system/minishift-set-ipaddress.service
 
-# Override dhclient script
-cat > dhclient-script.base64 << EOF
-${dhclient_script}
-EOF
-base64 -d < dhclient-script.base64 > dhclient-script
-rm dhclient-script.base64
-chmod +x dhclient-script
-mv dhclient-script /usr/sbin/dhclient-script
-
 
 # Systemd configuration
 systemctl disable kdump
