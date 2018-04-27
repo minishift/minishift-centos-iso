@@ -51,6 +51,10 @@ mount_partitions() {
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
 
+    mkdir -p /mnt/$PARTNAME/var/lib/origin
+    mkdir -p /var/lib/origin
+    mount --bind /mnt/$PARTNAME/var/lib/origin /var/lib/origin
+
     mkdir -p /mnt/$PARTNAME/opt
     ln -s /mnt/$PARTNAME/opt /opt
 
