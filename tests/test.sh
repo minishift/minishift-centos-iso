@@ -110,7 +110,7 @@ function verify_nfs_installation() {
 
 function verify_bind_mount() {
   output=`$BINARY ssh -- 'findmnt | grep "\[/var/lib/" | wc -l'`
-  assert_equal $output "9"
+  assert_equal $output "10"
   print_success_message "Bind mount check"
 }
 
