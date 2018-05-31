@@ -85,7 +85,7 @@ echo "blacklist floppy" > /etc/modprobe.d/nofloppy.conf
 echo "LANG=\"C\"" > /etc/locale.conf
 
 # Add docker user with 'tcuser' password
-/usr/sbin/useradd -p '$1$AhiE7wa5$d8puTTTSvN7Hq3JgUvfLV/' docker
+/usr/sbin/useradd -p 'wtd3OP71kP1NQ' docker
 /usr/sbin/usermod -a -G docker docker
 
 # sudo permission for docker user
