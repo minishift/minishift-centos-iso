@@ -47,6 +47,12 @@ mount_partitions() {
     mkdir -p /var/lib/boot2docker
     mount --bind /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
 
+    mkdir -p /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
+    cp -r /etc/docker/* /mnt/$PARTNAME/var/lib/boot2docker/etc/docker
+    rm -rf /etc/docker
+    mkdir -p /etc/docker
+    mount --bind /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
+
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
     mount --bind /mnt/$PARTNAME/var/lib/minishift /var/lib/minishift
