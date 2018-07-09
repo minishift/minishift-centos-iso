@@ -3,6 +3,7 @@
 BINARY=build/bin/minishift
 ISO=file://$(pwd)/build/minishift-centos7.iso
 EXTRA_FLAGS="--show-libmachine-logs"
+RHEL_IMAGE="registry.access.redhat.com/rhel7/rhel-atomic"
 
 function print_success_message() {
   echo ""
@@ -127,6 +128,11 @@ function verify_xfs_mount() {
   print_success_message "xfs mount successful"
 }
 
+function verify_rhel_registry_pull() {
+  $BINARY ssh -- docker pull $RHEL_IMAGE
+  exit_with_message "$?" "Error starting Minishift VM"
+}
+
 function verify_delete() {
   $BINARY delete --force
   exit_with_message "$?" "Error deleting Minishift VM"
@@ -144,5 +150,6 @@ verify_sshfs_installation
 verify_nfs_installation
 verify_bind_mount
 verify_xfs_mount
+verify_rhel_registry_pull
 verify_delete
 
