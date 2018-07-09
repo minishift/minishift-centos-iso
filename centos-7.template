@@ -49,7 +49,7 @@ nfs-utils
 go-hvkvp
 python-setuptools
 dnsmasq
-python-rhsm-certificates
+subscription-manager-rhsm-certificates
 
 #Packages to be removed
 -aic94xx-firmware
@@ -78,6 +78,9 @@ python-rhsm-certificates
 %end
 
 %post
+
+# This we should remove once the package subscription-manager-rhsm-certificates fixed
+touch /etc/rhsm/ca/redhat-uep.pem
 
 # Disable floppy driver to load
 echo "omit_drivers+=\"floppy\"" > /etc/dracut.conf.d/nofloppy.conf
