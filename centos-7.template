@@ -50,6 +50,7 @@ go-hvkvp
 python-setuptools
 dnsmasq
 subscription-manager-rhsm-certificates
+httpd-tools
 
 #Packages to be removed
 -aic94xx-firmware
