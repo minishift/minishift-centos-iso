@@ -47,7 +47,7 @@ nfs-utils
 go-hvkvp
 python-setuptools
 dnsmasq
-python-rhsm-certificates
+subscription-manager-rhsm-certificates
 httpd-tools
 
 #Packages to be removed
