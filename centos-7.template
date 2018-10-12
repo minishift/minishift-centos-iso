@@ -11,7 +11,7 @@ skipx
 rootpw --plaintext centos
 auth --useshadow --passalgo=sha512
 
-timezone --utc America/New_York
+timezone --utc Etc/UTC
 bootloader --timeout=1 --location=mbr --append="no_timer_check console=ttyS0 console=tty0 net.ifnames=0 biosdevname=0"
 clearpart --all
 part / --fstype="ext4" --size=10240
