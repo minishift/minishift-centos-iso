@@ -1,0 +1,16 @@
+#  This file is part of Minishift
+
+[Unit]
+Description=Minishift handle host keys
+ConditionFileIsExecutable=/usr/local/bin/minishift-handle-host-keys
+After=minishift-handle-user-data.service
+Before=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/minishift-handle-host-keys
+TimeoutSec=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
