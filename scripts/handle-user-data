@@ -43,6 +43,11 @@ mount_partitions() {
     mount --bind /mnt/$PARTNAME/var/lib/docker /var/lib/docker
     restorecon -R /var/lib/docker
 
+    mkdir -p /mnt/$PARTNAME/var/lib/containers
+    mkdir -p /var/lib/containers
+    mount --bind /mnt/$PARTNAME/var/lib/containers /var/lib/containers
+    restorecon -R /var/lib/containers
+
     mkdir -p /mnt/$PARTNAME/var/lib/boot2docker
     mkdir -p /var/lib/boot2docker
     mount --bind /mnt/$PARTNAME/var/lib/boot2docker /var/lib/boot2docker
@@ -52,6 +57,12 @@ mount_partitions() {
     rm -rf /etc/docker
     mkdir -p /etc/docker
     mount --bind /mnt/$PARTNAME/var/lib/boot2docker/etc/docker /etc/docker
+
+    mkdir -p /mnt/$PARTNAME/etc/containers
+    cp -r /etc/containers/* /mnt/$PARTNAME/etc/containers
+    rm -rf /etc/containers
+    mkdir -p /etc/containers
+    mount --bind /mnt/$PARTNAME/etc/containers /etc/containers
 
     mkdir -p /mnt/$PARTNAME/var/lib/minishift
     mkdir -p /var/lib/minishift
