@@ -2,6 +2,8 @@ BUILD_DIR=$(shell pwd)/build
 BIN_DIR=$(BUILD_DIR)/bin
 HANDLE_USER_DATA=$(shell base64 -w 0 scripts/handle-user-data)
 HANDLE_USER_DATA_SERVICE=$(shell base64 -w 0 scripts/handle-user-data.service)
+HANDLE_HOST_KEYS=$(shell base64 -w 0 scripts/handle-host-keys)
+HANDLE_HOST_KEYS_SERVICE=$(shell base64 -w 0 scripts/handle-host-keys.service)
 YUM_WRAPPER=$(shell base64 -w 0 scripts/yum-wrapper)
 CERT_GEN=$(shell base64 -w 0 scripts/cert-gen)
 SET_IPADDRESS=$(shell base64 -w 0 scripts/set-ipaddress)
@@ -68,6 +70,7 @@ rhel_kickstart: kickstart
 .PHONY: kickstart
 kickstart: init
 	@handle_user_data='$(HANDLE_USER_DATA)' handle_user_data_service='$(HANDLE_USER_DATA_SERVICE)' \
+	    handle_host_keys='$(HANDLE_HOST_KEYS)' handle_host_keys_service='$(HANDLE_HOST_KEYS_SERVICE)' \
         set_ipaddress='$(SET_IPADDRESS)' set_ipaddress_service='$(SET_IPADDRESS_SERVICE)' \
         yum_wrapper='$(YUM_WRAPPER)' cert_gen='$(CERT_GEN)' \
 		version='$(VERSION)' build_id='$(GITTAG)-$(TODAY)-$(BUILD_ID)' \

@@ -162,6 +162,22 @@ base64 -d < handle-user-data-service.base64 > handle-user-data.service
 rm handle-user-data-service.base64
 mv handle-user-data.service /usr/lib/systemd/system/minishift-handle-user-data.service
 
+# Place holder for base64 encode handle-host-keys script
+cat > handle-host-keys.base64 << EOF
+${handle_host_keys}
+EOF
+base64 -d < handle-host-keys.base64 > handle-host-keys
+rm -f handle-host-keys.base64
+chmod +x handle-host-keys
+mv handle-host-keys /usr/local/bin/minishift-handle-host-keys
+
+# Handle host keys (systemd service)
+cat > handle-host-keys-service.base64 << EOF
+${handle_host_keys_service}
+EOF
+base64 -d < handle-host-keys-service.base64 > handle-host-keys.service
+rm handle-host-keys-service.base64
+mv handle-host-keys.service /usr/lib/systemd/system/minishift-handle-host-keys.service
 
 # Set IP address based on settings or hvkvp (Hyper-V)
 cat > set-ipaddress.base64 << EOF
@@ -190,6 +206,7 @@ systemctl disable NetworkManager-dispatcher
 systemctl disable NetworkManager-wait-online
 systemctl disable dnsmasq
 systemctl enable minishift-handle-user-data
+systemctl enable minishift-handle-host-keys
 systemctl enable minishift-set-ipaddress
 systemctl enable docker
 

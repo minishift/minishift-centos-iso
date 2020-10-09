@@ -1,0 +1,43 @@
+#!/bin/sh
+
+LABEL=b2d-data
+MAGIC="boot2docker, please format-me"
+UNPARTITIONED_HD="/dev/$(lsblk | grep disk | grep ".*da" | cut -f1 -d' ')"
+
+# Function to extract userdata.tar containing the ssh keys into the home directory /home/docker
+handle_host_keys() {
+    # Restore host ssh keys to avoid problems with external unknown_hosts configurations.
+    PARTNAME=`echo "$BOOT2DOCKER_DATA" | sed 's/.*\///'`
+    if [ -e "/mnt/$PARTNAME/etc/ssh" ]; then
+	    # Restore initial ssh keys
+        cp /mnt/$PARTNAME/etc/ssh/* /etc/ssh
+    else
+        # Save initial ssh keys	    
+        mkdir -p /mnt/$PARTNAME/etc/ssh
+        cp /etc/ssh/*key* /mnt/$PARTNAME/etc/ssh
+    fi
+}
+
+# TODO Need to make sure to have /sbin on the PATH. Is there a better way?
+# http://stackoverflow.com/questions/19983710/some-commands-not-wroking-on-remote-servers-through-ssh-shell
+# https://github.com/LalatenduMohanty/centos-live-iso/issues/11
+echo 'PATH=$PATH:/sbin' >> /home/docker/.bashrc
+
+# If there is a partition with `boot2docker-data` as its label we are dealing with
+# an already bootstrapped docker-machine. Just make sure to mount data partition and to unpack
+# userdata.tar. Remember, /home/docker is not persistent
+BOOT2DOCKER_DATA=`blkid -o device -l -t LABEL=$LABEL`
+if [ -n "$BOOT2DOCKER_DATA" ]; then
+    handle_host_keys
+    exit 0
+fi
+
+# Test for our magic string (it means that the disk was made by ./boot2docker init)
+HEADER=`dd if=$UNPARTITIONED_HD bs=1 count=${#MAGIC} 2>/dev/null`
+if [ "$HEADER" = "$MAGIC" ]; then
+    # Read /userdata.tar with ssh keys and place it temporarily under /
+    dd if=$UNPARTITIONED_HD of=/userdata.tar bs=1 count=4096 2>/dev/null
+
+    handle_host_keys
+    exit 0
+fi
